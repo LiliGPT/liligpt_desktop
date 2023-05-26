@@ -8,15 +8,17 @@ import { Provider, useSelector } from "react-redux";
 import { store } from "./features/redux/store";
 import WelcomeContent from "./features/welcome/WelcomeContent";
 import { selectProjectDir } from "./features/editor/editorCurrentProjectSlice";
-import CurrentProject from "./features/editor/CurrentProject";
+import { CurrentProjectPage } from "./features/editor/CurrentProject/page";
 import { useAppSelector } from "./features/redux/hooks";
 
 function App() {
   console.log('HELLO THERE!'); // TODO: this console.log is not working
   return (
-    <Provider store={store}>
-      <InnerApp />
-    </Provider>
+    <div className="h-screen w-screen">
+      <Provider store={store}>
+        <InnerApp />
+      </Provider>
+    </div>
   );
 }
 
@@ -27,7 +29,7 @@ function InnerApp() {
   if (projectDir === '') {
     content = <WelcomeContent />;
   } else {
-    content = <CurrentProject />;
+    content = <CurrentProjectPage />;
   }
 
   return content;
