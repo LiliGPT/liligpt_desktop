@@ -6,9 +6,9 @@ pub fn get_connection() -> sqlite::Connection {
 }
 
 pub fn create_database() -> () {
-    let SHOULD_DROP = false;
+    let _should_drop = false;
     let mut query = String::from("");
-    if SHOULD_DROP {
+    if _should_drop {
         println!("[!] Dropping database...");
         query += "DROP TABLE IF EXISTS projects;";
     }
