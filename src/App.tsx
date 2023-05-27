@@ -4,10 +4,10 @@ import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import Grid from '@mui/material/Unstable_Grid2';
 import { Button, Stack } from "@mui/material";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { store } from "./features/redux/store";
 import WelcomeContent from "./features/welcome/WelcomeContent";
-import { selectProjectDir } from "./features/editor/editorCurrentProjectSlice";
+import { selectEditorCurrentProject, selectProjectDir } from "./features/editor/editorCurrentProjectSlice";
 import { CurrentProjectPage } from "./features/editor/CurrentProject/page";
 import { useAppSelector } from "./features/redux/hooks";
 
@@ -23,7 +23,7 @@ function App() {
 }
 
 function InnerApp() {
-  const projectDir = useSelector(selectProjectDir);
+  const projectDir = useAppSelector(selectProjectDir);
   let content;
 
   if (projectDir === '') {

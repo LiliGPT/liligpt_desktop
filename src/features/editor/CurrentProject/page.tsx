@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { useAppSelector } from "../../redux/hooks";
 import { selectProjectDir } from "../editorCurrentProjectSlice";
 import { CurrentProjectSidebar } from "./Sidebar";
+import { NestjsProjectPage } from "../../nestjs/ProjectPage";
 
 export function CurrentProjectPage() {
   const projectDir = useAppSelector(selectProjectDir);
@@ -18,9 +19,7 @@ export function CurrentProjectPage() {
         </div>
         <div className="flex flex-col w-4/6">
           <div className="flex flex-row">
-            <Button variant="contained" onClick={() => invoke("new_scene")}>
-              New Scene
-            </Button>
+            <NestjsProjectPage />
           </div>
         </div>
       </div>

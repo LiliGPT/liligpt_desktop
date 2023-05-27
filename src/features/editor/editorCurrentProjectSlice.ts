@@ -14,14 +14,24 @@ export type OptionalRenderTree = RenderTree | undefined;
 
 export interface EditorCurrentProjectState {
   projectDir: string;
+  displayName: string;
   renderTree: OptionalRenderTree;
   errorMessage: string;
   isLoading: boolean;
   isSuccess: boolean;
 }
 
+// const initialState: EditorCurrentProjectState = {
+//   projectDir: '',
+//   displayName: '',
+//   errorMessage: '',
+//   renderTree: undefined,
+//   isLoading: false,
+//   isSuccess: false,
+// };
 const initialState: EditorCurrentProjectState = {
-  projectDir: '',
+  projectDir: '/home/l/dasa/sigo/v2',
+  displayName: 'v2',
   errorMessage: '',
   renderTree: undefined,
   isLoading: false,
@@ -30,7 +40,7 @@ const initialState: EditorCurrentProjectState = {
 
 // --- slice
 
-export const currentProject = createSlice({
+export const editorCurrentProject = createSlice({
   name: 'editorCurrentProject',
   initialState,
   reducers: {
@@ -44,6 +54,7 @@ export const currentProject = createSlice({
       return {
         ...state,
         renderTree: action.payload,
+        displayName: action.payload?.name ?? '',
         errorMessage: '',
         isSuccess: true,
         isLoading: false,
@@ -82,7 +93,7 @@ export const selectEditorCurrentProject = (state: RootState): EditorCurrentProje
 
 // --- actions
 
-export const { setProjectDir, setRenderTree, setError, setLoading, setSuccess } = currentProject.actions;
+export const { setProjectDir, setRenderTree, setError, setLoading, setSuccess } = editorCurrentProject.actions;
 
 // --- thunks
 
@@ -99,4 +110,4 @@ export const loadRenderTree = () => async (dispatch: Dispatch, getState: () => R
 
 // --- reducer
 
-export default currentProject.reducer;
+export default editorCurrentProject.reducer;

@@ -1,15 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import editorCurrentProject from '../editor/editorCurrentProjectSlice';
+import { editorCurrentProject } from '../editor/editorCurrentProjectSlice';
 
 export const store = configureStore({
   devTools: true,
   preloadedState: {
-    editorCurrentProject: {
-      projectDir: '',
-    },
+    editorCurrentProject: editorCurrentProject.getInitialState(),
   },
   reducer: {
-    editorCurrentProject,
+    editorCurrentProject: editorCurrentProject.reducer,
   }
 });
 
