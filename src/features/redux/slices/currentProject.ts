@@ -1,5 +1,5 @@
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../redux/store';
+import { RootState } from '../store';
 import { invoke } from "@tauri-apps/api/tauri";
 
 export interface RenderTree {
@@ -40,7 +40,7 @@ const initialState: EditorCurrentProjectState = {
 
 // --- slice
 
-export const editorCurrentProject = createSlice({
+export const currentProjectSlice = createSlice({
   name: 'editorCurrentProject',
   initialState,
   reducers: {
@@ -93,7 +93,7 @@ export const selectEditorCurrentProject = (state: RootState): EditorCurrentProje
 
 // --- actions
 
-export const { setProjectDir, setRenderTree, setError, setLoading, setSuccess } = editorCurrentProject.actions;
+export const { setProjectDir, setRenderTree, setError, setLoading, setSuccess } = currentProjectSlice.actions;
 
 // --- thunks
 
@@ -110,4 +110,4 @@ export const loadRenderTree = () => async (dispatch: Dispatch, getState: () => R
 
 // --- reducer
 
-export default editorCurrentProject.reducer;
+export default currentProjectSlice.reducer;

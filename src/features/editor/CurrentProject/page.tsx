@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useAppSelector } from "../../redux/hooks";
-import { selectProjectDir } from "../slice";
+import { selectProjectDir } from "../../redux/slices/currentProject";
 import { CurrentProjectSidebar } from "./Sidebar";
 import { ProjectOverview } from "../ProjectOverview";
 

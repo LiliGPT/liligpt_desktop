@@ -1,5 +1,5 @@
 import { notification } from "@tauri-apps/api";
-import { selectEditorCurrentProject } from "../slice"
+import { selectEditorCurrentProject } from "../../redux/slices/currentProject"
 import { useAppSelector } from "../../redux/hooks"
 import ConfigIcon from '@mui/icons-material/Settings';
 import { Button } from "@mui/material";

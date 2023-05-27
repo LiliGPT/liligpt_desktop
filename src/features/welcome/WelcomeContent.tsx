@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useAppDispatch } from "../redux/hooks";
-import { setProjectDir } from "../editor/slice";
+import { setProjectDir } from "../redux/slices/currentProject";
 import { message } from '@tauri-apps/api/dialog';
 
 export default function WelcomeContent() {
