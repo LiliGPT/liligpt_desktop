@@ -1,7 +1,6 @@
 import { notification } from "@tauri-apps/api";
-import { selectCurrentProject } from "../../redux/slices/currentProject"
-import { useAppSelector } from "../../redux/hooks"
-import ConfigIcon from '@mui/icons-material/Settings';
+import { selectCurrentProject } from "../../../redux/slices/currentProject"
+import { useAppSelector } from "../../../redux/hooks"
 import { Button } from "@mui/material";
 
 export function ProjectOverview() {
@@ -13,11 +12,8 @@ export function ProjectOverview() {
 
   // header will be horizontal with title <h1/> and a clickable config icon in the right
   const header = (
-    <div className="flex flex-row justify-between items-center">
+    <div>
       <h1>{currentProject.displayName}</h1>
-      <span className="cursor-pointer" onClick={onClickConfigButton}>
-        <ConfigIcon className="-mt-6 cursor-pointer" />
-      </span>
     </div>
   );
 

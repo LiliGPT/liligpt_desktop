@@ -1,5 +1,5 @@
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../store';
+import { RootState } from '../features/redux/store';
 import { invoke } from "@tauri-apps/api/tauri";
 
 export interface RenderTree {

@@ -5,11 +5,12 @@ import "./App.css";
 import Grid from '@mui/material/Unstable_Grid2';
 import { Button, Stack } from "@mui/material";
 import { Provider } from "react-redux";
-import { store } from "./features/redux/store";
-import WelcomeContent from "./features/welcome/WelcomeContent";
-import { selectCurrentProject, selectProjectDir } from "./features/redux/slices/currentProject";
-import { CurrentProjectPage } from "./features/editor/CurrentProject/page";
-import { useAppSelector } from "./features/redux/hooks";
+import { store } from "./redux/store";
+import { WelcomeView } from "./features/welcome/WelcomeView";
+import { selectCurrentProject, selectProjectDir } from "./redux/slices/currentProject";
+import { CurrentProjectView } from "./features/editor/CurrentProjectView";
+import { useAppSelector } from "./redux/hooks";
+import { EditorView } from "./features/editor/EditorView";
 
 function App() {
   console.log('HELLO THERE!'); // TODO: this console.log is not working
@@ -22,14 +23,14 @@ function App() {
   );
 }
 
-function InnerApp() {
+export function InnerApp() {
   const projectDir = useAppSelector(selectProjectDir);
   let content;
 
   if (projectDir === '') {
-    content = <WelcomeContent />;
+    content = <WelcomeView />;
   } else {
-    content = <CurrentProjectPage />;
+    content = <EditorView />;
   }
 
   return content;

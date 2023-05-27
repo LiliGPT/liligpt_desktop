@@ -7,8 +7,8 @@ import FileIcon from '@mui/icons-material/InsertDriveFile';
 import { SvgIcon, SvgIconProps } from "@mui/material";
 import { alpha, styled } from '@mui/material/styles';
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { OptionalRenderTree, RenderTree, loadRenderTree, selectCurrentProject } from "../../redux/slices/currentProject";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { RenderTree, loadRenderTree, selectCurrentProject } from "../../../redux/slices/currentProject";
 
 /*
 const data: RenderTree = {
