@@ -1,5 +1,3 @@
-use std::sync::Mutex;
-
 pub fn get_connection() -> sqlite::Connection {
     let connection = sqlite::open("/tmp/deleteme.db").unwrap();
     connection
