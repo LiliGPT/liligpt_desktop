@@ -7,7 +7,7 @@ import { Button, Stack } from "@mui/material";
 import { Provider } from "react-redux";
 import { store } from "./features/redux/store";
 import WelcomeContent from "./features/welcome/WelcomeContent";
-import { selectEditorCurrentProject, selectProjectDir } from "./features/editor/editorCurrentProjectSlice";
+import { selectEditorCurrentProject, selectProjectDir } from "./features/editor/slice";
 import { CurrentProjectPage } from "./features/editor/CurrentProject/page";
 import { useAppSelector } from "./features/redux/hooks";
 

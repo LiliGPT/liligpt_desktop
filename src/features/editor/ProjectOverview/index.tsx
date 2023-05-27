@@ -1,10 +1,10 @@
 import { notification } from "@tauri-apps/api";
-import { selectEditorCurrentProject } from "../../editor/editorCurrentProjectSlice"
+import { selectEditorCurrentProject } from "../slice"
 import { useAppSelector } from "../../redux/hooks"
 import ConfigIcon from '@mui/icons-material/Settings';
 import { Button } from "@mui/material";
 
-export function NestjsProjectPage() {
+export function ProjectOverview() {
   const currentProject = useAppSelector(selectEditorCurrentProject);
 
   const onClickConfigButton = async () => {

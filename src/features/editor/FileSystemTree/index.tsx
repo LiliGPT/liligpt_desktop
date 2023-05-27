@@ -8,7 +8,7 @@ import { SvgIcon, SvgIconProps } from "@mui/material";
 import { alpha, styled } from '@mui/material/styles';
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { OptionalRenderTree, RenderTree, loadRenderTree, selectEditorCurrentProject } from "../editorCurrentProjectSlice";
+import { OptionalRenderTree, RenderTree, loadRenderTree, selectEditorCurrentProject } from "../slice";
 
 /*
 const data: RenderTree = {

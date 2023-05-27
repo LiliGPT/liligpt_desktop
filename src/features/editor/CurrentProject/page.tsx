@@ -1,9 +1,9 @@
 import { Button } from "@mui/material";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useAppSelector } from "../../redux/hooks";
-import { selectProjectDir } from "../editorCurrentProjectSlice";
+import { selectProjectDir } from "../slice";
 import { CurrentProjectSidebar } from "./Sidebar";
-import { NestjsProjectPage } from "../../nestjs/ProjectPage";
+import { ProjectOverview } from "../ProjectOverview";
 
 export function CurrentProjectPage() {
   const projectDir = useAppSelector(selectProjectDir);
@@ -19,7 +19,7 @@ export function CurrentProjectPage() {
         </div>
         <div className="flex flex-col w-4/6">
           <div className="flex flex-row">
-            <NestjsProjectPage />
+            <ProjectOverview />
           </div>
         </div>
       </div>

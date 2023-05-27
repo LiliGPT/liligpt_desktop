@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { editorCurrentProject } from '../editor/editorCurrentProjectSlice';
+import { editorCurrentProject } from '../editor/slice';
 
 export const store = configureStore({
   devTools: true,
