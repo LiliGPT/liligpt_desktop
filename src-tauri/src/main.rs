@@ -2,9 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![allow(unused_must_use)]
 
+mod code_analyst;
 mod database;
 mod frameworks;
 mod io;
+mod project;
 mod tauri_commands;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command

@@ -35,8 +35,8 @@ export function ProjectOverview() {
 
       <h2>Sobre o Projeto</h2>
       <ul className="list-disc list-inside ml-1 mb-5">
-        <li>Linguagem: Node.js</li>
-        <li>Framework: Nestjs</li>
+        <li>Linguagem: {currentProject.codeLanguage}</li>
+        <li>Framework: {currentProject.framework}</li>
         <li>
           Estado atual dos testes
           <span className="block ml-5">

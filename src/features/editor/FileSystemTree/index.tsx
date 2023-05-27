@@ -8,7 +8,8 @@ import { SvgIcon, SvgIconProps } from "@mui/material";
 import { alpha, styled } from '@mui/material/styles';
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { RenderTree, loadRenderTree, selectCurrentProject } from "../../../redux/slices/currentProject";
+import { selectCurrentProject } from "../../../redux/slices/currentProject";
+import { RenderTree } from "../../../services/rust";
 
 /*
 const data: RenderTree = {
@@ -50,13 +51,7 @@ const StyledTreeItem = styled((props: TreeItemProps) => (
 }));
 
 export function FileSystemTree() {
-  const dispatch = useAppDispatch();
   const renderTree = useAppSelector(selectCurrentProject);
-
-  useEffect(() => {
-    dispatch(loadRenderTree());
-  }, []);
-
 
   if (renderTree.errorMessage) {
     return <div>Error: {renderTree.errorMessage}</div>;
@@ -76,7 +71,7 @@ export function FileSystemTree() {
   const buildTree = (nodes: RenderTree) => (
     <StyledTreeItem key={nodes.name} nodeId={nodes.name} label={nodes.name}>
       {Array.isArray(nodes.children)
-        ? nodes.children.map((node) => buildTree(node))
+        ? nodes.children.map((node: any) => buildTree(node))
         : null}
     </StyledTreeItem>
   );

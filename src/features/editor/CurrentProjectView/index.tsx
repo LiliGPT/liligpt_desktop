@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useAppSelector } from "../../../redux/hooks";
-import { selectProjectDir } from "../../../redux/slices/currentProject";
+import { selectCurrentProject, selectProjectDir } from "../../../redux/slices/currentProject";
 import { ProjectSidebar } from "./ProjectSidebar";
 import { ProjectOverview } from "./ProjectOverview";
 import ConfigIcon from '@mui/icons-material/Settings';
@@ -30,6 +30,6 @@ export function CurrentProjectView({ onClickConfigButton }: Props) {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

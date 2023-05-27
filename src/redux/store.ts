@@ -4,10 +4,10 @@ import { currentProjectSlice } from '../redux/slices/currentProject';
 export const store = configureStore({
   devTools: true,
   preloadedState: {
-    editorCurrentProject: currentProjectSlice.getInitialState(),
+    currentProject: currentProjectSlice.getInitialState(),
   },
   reducer: {
-    editorCurrentProject: currentProjectSlice.reducer,
+    currentProject: currentProjectSlice.reducer,
   }
 });
 

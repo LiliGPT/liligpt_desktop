@@ -1,3 +1,0 @@
-enum CodeLanguage {}
-
-impl CodeLanguage {}

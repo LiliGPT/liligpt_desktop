@@ -1,42 +1,38 @@
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '../features/redux/store';
-import { invoke } from "@tauri-apps/api/tauri";
-
-export interface RenderTree {
-  id: string;
-  name: string;
-  children?: readonly RenderTree[];
-}
+import { RootState } from '../../redux/store';
+import { OptionalRenderTree, ProjectFromRust, rustGetFileTree, rustOpenProject } from '../../services/rust';
 
 // --- initial state
-
-export type OptionalRenderTree = RenderTree | undefined;
 
 export interface CurrentProjectState {
   projectDir: string;
   displayName: string;
+  codeLanguage: string;
+  framework: string;
   renderTree: OptionalRenderTree;
   errorMessage: string;
   isLoading: boolean;
   isSuccess: boolean;
 }
 
+const initialState: CurrentProjectState = {
+  projectDir: '',
+  displayName: '',
+  errorMessage: '',
+  codeLanguage: '',
+  framework: '',
+  renderTree: undefined,
+  isLoading: false,
+  isSuccess: false,
+};
 // const initialState: CurrentProjectState = {
-//   projectDir: '',
-//   displayName: '',
+//   projectDir: '/home/l/dasa/sigo/v2',
+//   displayName: 'v2',
 //   errorMessage: '',
 //   renderTree: undefined,
 //   isLoading: false,
 //   isSuccess: false,
 // };
-const initialState: CurrentProjectState = {
-  projectDir: '/home/l/dasa/sigo/v2',
-  displayName: 'v2',
-  errorMessage: '',
-  renderTree: undefined,
-  isLoading: false,
-  isSuccess: false,
-};
 
 // --- slice
 
@@ -44,6 +40,14 @@ export const currentProjectSlice = createSlice({
   name: 'currentProject',
   initialState,
   reducers: {
+    setProjectFromRust: (state, action: PayloadAction<ProjectFromRust>) => {
+      return {
+        ...state,
+        projectDir: action.payload.project_dir,
+        codeLanguage: action.payload.code_language,
+        framework: action.payload.framework,
+      };
+    },
     setProjectDir: (state, action: PayloadAction<string>) => {
       return {
         ...state,
@@ -87,9 +91,9 @@ export const currentProjectSlice = createSlice({
 
 // --- selectors
 
-export const selectProjectDir = (state: RootState): string => state.editorCurrentProject.projectDir;
-// export const selectRenderTree = (state: RootState): RenderTree | undefined => state.editorCurrentProject.renderTree;
-export const selectCurrentProject = (state: RootState): CurrentProjectState => state.editorCurrentProject;
+export const selectProjectDir = (state: RootState): string => state.currentProject.projectDir;
+// export const selectRenderTree = (state: RootState): RenderTree | undefined => state.currentProject.renderTree;
+export const selectCurrentProject = (state: RootState): CurrentProjectState => state.currentProject;
 
 // --- actions
 
@@ -97,13 +101,27 @@ export const { setProjectDir, setRenderTree, setError, setLoading, setSuccess } 
 
 // --- thunks
 
-export const loadRenderTree = () => async (dispatch: Dispatch, getState: () => RootState) => {
+export const openProjectThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {
   try {
     dispatch(setLoading());
-    const path = selectProjectDir(getState());
-    const tree = await invoke("get_file_tree", { path }) as unknown as RenderTree;
+    const projectFromRust = await rustOpenProject();
+    dispatch(currentProjectSlice.actions.setProjectFromRust(projectFromRust));
+    const tree = await rustGetFileTree(projectFromRust.project_dir);
     dispatch(setRenderTree(tree));
   } catch (e) {
+    dispatch(setError(e as Error));
+  }
+}
+
+export const loadRenderTreeThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {
+  try {
+    dispatch(setLoading());
+    const projectDir = selectProjectDir(getState());
+    // setTimeout(() => dispatch(setError(`cheguei`)), 1500);
+    const tree = await rustGetFileTree(projectDir);
+    dispatch(setRenderTree(tree));
+  } catch (e) {
+    // alert("[003j9] " + JSON.stringify(e));
     dispatch(setError(e as Error));
   }
 };
