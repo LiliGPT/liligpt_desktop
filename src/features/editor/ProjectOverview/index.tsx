@@ -1,11 +1,11 @@
 import { notification } from "@tauri-apps/api";
-import { selectEditorCurrentProject } from "../../redux/slices/currentProject"
+import { selectCurrentProject } from "../../redux/slices/currentProject"
 import { useAppSelector } from "../../redux/hooks"
 import ConfigIcon from '@mui/icons-material/Settings';
 import { Button } from "@mui/material";
 
 export function ProjectOverview() {
-  const currentProject = useAppSelector(selectEditorCurrentProject);
+  const currentProject = useAppSelector(selectCurrentProject);
 
   const onClickConfigButton = async () => {
     alert('TODO: open config modal');

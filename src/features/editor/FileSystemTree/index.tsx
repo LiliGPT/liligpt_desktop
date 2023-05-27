@@ -8,7 +8,7 @@ import { SvgIcon, SvgIconProps } from "@mui/material";
 import { alpha, styled } from '@mui/material/styles';
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { OptionalRenderTree, RenderTree, loadRenderTree, selectEditorCurrentProject } from "../../redux/slices/currentProject";
+import { OptionalRenderTree, RenderTree, loadRenderTree, selectCurrentProject } from "../../redux/slices/currentProject";
 
 /*
 const data: RenderTree = {
@@ -51,7 +51,7 @@ const StyledTreeItem = styled((props: TreeItemProps) => (
 
 export function FileSystemTree() {
   const dispatch = useAppDispatch();
-  const renderTree = useAppSelector(selectEditorCurrentProject);
+  const renderTree = useAppSelector(selectCurrentProject);
 
   useEffect(() => {
     dispatch(loadRenderTree());

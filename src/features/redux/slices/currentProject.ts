@@ -12,7 +12,7 @@ export interface RenderTree {
 
 export type OptionalRenderTree = RenderTree | undefined;
 
-export interface EditorCurrentProjectState {
+export interface CurrentProjectState {
   projectDir: string;
   displayName: string;
   renderTree: OptionalRenderTree;
@@ -21,7 +21,7 @@ export interface EditorCurrentProjectState {
   isSuccess: boolean;
 }
 
-// const initialState: EditorCurrentProjectState = {
+// const initialState: CurrentProjectState = {
 //   projectDir: '',
 //   displayName: '',
 //   errorMessage: '',
@@ -29,7 +29,7 @@ export interface EditorCurrentProjectState {
 //   isLoading: false,
 //   isSuccess: false,
 // };
-const initialState: EditorCurrentProjectState = {
+const initialState: CurrentProjectState = {
   projectDir: '/home/l/dasa/sigo/v2',
   displayName: 'v2',
   errorMessage: '',
@@ -41,7 +41,7 @@ const initialState: EditorCurrentProjectState = {
 // --- slice
 
 export const currentProjectSlice = createSlice({
-  name: 'editorCurrentProject',
+  name: 'currentProject',
   initialState,
   reducers: {
     setProjectDir: (state, action: PayloadAction<string>) => {
@@ -89,7 +89,7 @@ export const currentProjectSlice = createSlice({
 
 export const selectProjectDir = (state: RootState): string => state.editorCurrentProject.projectDir;
 // export const selectRenderTree = (state: RootState): RenderTree | undefined => state.editorCurrentProject.renderTree;
-export const selectEditorCurrentProject = (state: RootState): EditorCurrentProjectState => state.editorCurrentProject;
+export const selectCurrentProject = (state: RootState): CurrentProjectState => state.editorCurrentProject;
 
 // --- actions
 
