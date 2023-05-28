@@ -1,5 +1,5 @@
 import ConfigIcon from '@mui/icons-material/Settings';
-import { SvgIcon } from '@mui/material';
+import { CircularProgress, SvgIcon } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { fetchCurrentTestingScripts, selectCurrentTesting } from '../../../redux/slices/currentTesting';
 import { useEffect } from 'react';
@@ -40,22 +40,41 @@ export function TestingStatus() {
       </div>
       {currentTesting.scripts && currentTesting.scripts.map((script) => {
         let testStatusColor = 'bg-gray-500';
-        if (script.isSuccess === false) testStatusColor = 'bg-green-500';
-        if (script.isSuccess === true) testStatusColor = 'bg-red-500';
+        if (script.isSuccess === false) testStatusColor = 'bg-red-500';
+        if (script.isSuccess === true) testStatusColor = 'bg-green-500';
         const testCoverage = `${script.coverage}%`;
         let testCoverageColor = 'text-gray-500';
         if (script.coverage > 80) testCoverageColor = 'text-green-500';
         else if (script.coverage > 50) testCoverageColor = 'text-yellow-500';
         else testCoverageColor = 'text-red-500';
-        let coverageContent = script.coverage > 0 ? (
+        const coverageContent = script.coverage > 0 ? (
           <span className={testCoverageColor}>{' - '}{testCoverage}</span>
         ) : <></>;
+        let testResult;
+        if (script.isSuccess !== null) {
+          testResult = script.isSuccess === false ? (
+            <span className="text-red-500">{' - '}{script.output}</span>
+          ) : (
+            <></>
+          );
+        }
+        const testStatus = script.isLoading ? (
+          <span className="inline-block pr-2">
+            <CircularProgress size={8} color="primary" />
+          </span>
+        ) : (
+          <div className={`w-2 h-2 rounded-full ${testStatusColor} inline-block mr-2`}></div>
+        );
         return (
           <div className="p-0.5">
-            <div className={`w-2 h-2 rounded-full ${testStatusColor} inline-block mr-2`}></div>
+            {testStatus}
             <span>{script.scriptKey}</span>{coverageContent}
+            {script.isSuccess === false && (<>
+              <br />
+              <span className="text-gray-400 text-xs">{script.scriptValue}</span>
+            </>)}
             <br />
-            <span className="text-gray-400 text-xs">{script.scriptValue}</span>
+            {testResult}
           </div>
         );
       })}
@@ -88,7 +107,7 @@ export function TestingStatus() {
   }
 
   return (
-    <div className="relative bg-slate-700 text-gray-100 text-sm p-2 pl-3 pb-3 rounded-md mb-3">
+    <div className="relative bg-gray-100 text-gray-900 text-sm p-2 pl-3 pb-3 rounded-md mb-3">
       <div className="absolute right-2 top-1.5">
         <span onClick={() => { }}>
           <SvgIcon component={ConfigIcon} fontSize='small' />

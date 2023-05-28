@@ -59,3 +59,17 @@ export function rustGetTestScripts(projectDir: string): Promise<TestScriptFromRu
     });
   });
 }
+
+export function rustRunShellCommand(cwd: string, command: string): Promise<string> {
+  // return invoke("run_shell_command", { project_dir: cwd, command });
+  return new Promise((resolve, reject) => {
+    const request = { cwd, command };
+    invoke("run_shell_command", request).then(response => {
+      console.log(`[rustRunShellCommand]`, { request, response })
+      resolve(response as string);
+    }).catch(error => {
+      console.log(`[rustRunShellCommand]`, { request, error })
+      reject(error);
+    });
+  });
+}
