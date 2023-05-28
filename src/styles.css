@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #f2f2f2;
-}
-
 h1 {
   margin-bottom: 1rem;
   font-weight: bold;

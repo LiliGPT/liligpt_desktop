@@ -1,13 +1,11 @@
 pub struct Project {
-    pub project_dir: String,
-    pub project: Option<crate::database::entities::Project>,
+    project_dir: String,
 }
 
 impl Project {
     pub async fn new_from_directory(project_dir: &str) -> Self {
         Self {
             project_dir: project_dir.to_owned(),
-            project: None,
         }
     }
 

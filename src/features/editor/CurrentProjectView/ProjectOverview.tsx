@@ -2,6 +2,7 @@ import { notification } from "@tauri-apps/api";
 import { selectCurrentProject } from "../../../redux/slices/currentProject"
 import { useAppSelector } from "../../../redux/hooks"
 import { Button } from "@mui/material";
+import { TestingStatus } from "./TestingStatus";
 
 export function ProjectOverview() {
   const currentProject = useAppSelector(selectCurrentProject);
@@ -31,24 +32,14 @@ export function ProjectOverview() {
   return (
     <div className="w-full p-2">
       {header}
-      <p className="mb-5 italic text-gray-400">Vou colocar aqui o que vou fazer em sequência.</p>
 
-      <h2>Sobre o Projeto</h2>
       <ul className="list-disc list-inside ml-1 mb-5">
         <li>Linguagem: {currentProject.codeLanguage}</li>
         <li>Framework: {currentProject.framework}</li>
-        <li>
-          Estado atual dos testes
-          <span className="block ml-5">
-            <ul className="list-disc list-inside">
-              <li>Testes unitários</li>
-              <li>Testes de integração</li>
-              <li>Coverage: 85%</li>
-            </ul>
-          </span>
-        </li>
         <li>Padronização do código - Modular</li>
       </ul>
+
+      <TestingStatus />
 
       <h2>Aplicações rodando</h2>
       <ul className="list-disc list-inside ml-1 mb-5 text-sm">

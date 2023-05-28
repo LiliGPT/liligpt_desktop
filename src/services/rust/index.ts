@@ -41,3 +41,21 @@ export function rustGetFileTree(projectDir: string): Promise<RenderTree> {
     });
   });
 }
+
+export interface TestScriptFromRust {
+  [scriptName: string]: string;
+}
+
+export function rustGetTestScripts(projectDir: string): Promise<TestScriptFromRust> {
+  // return invoke("get_test_scripts", { project_dir: projectDir });
+  return new Promise((resolve, reject) => {
+    const request = { projectDir };
+    invoke("get_test_scripts", request).then(response => {
+      console.log(`[rustGetTestScripts]`, { request, response })
+      resolve(response as TestScriptFromRust);
+    }).catch(error => {
+      console.log(`[rustGetTestScripts]`, { request, error })
+      reject(error);
+    });
+  });
+}

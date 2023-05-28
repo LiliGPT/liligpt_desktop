@@ -40,6 +40,21 @@ export const currentProjectSlice = createSlice({
   name: 'currentProject',
   initialState,
   reducers: {
+    setError: (state, action: PayloadAction<string | Error>) => {
+      const errorMessage: string = action.payload instanceof Error ? action.payload.message : action.payload;
+      return {
+        ...state,
+        errorMessage,
+        isSuccess: false,
+        isLoading: false,
+      };
+    },
+    setLoading: (state, action: PayloadAction<undefined>) => {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    },
     setProjectFromRust: (state, action: PayloadAction<ProjectFromRust>) => {
       return {
         ...state,
@@ -62,21 +77,6 @@ export const currentProjectSlice = createSlice({
         errorMessage: '',
         isSuccess: true,
         isLoading: false,
-      };
-    },
-    setError: (state, action: PayloadAction<string | Error>) => {
-      const errorMessage: string = action.payload instanceof Error ? action.payload.message : action.payload;
-      return {
-        ...state,
-        errorMessage,
-        isSuccess: false,
-        isLoading: false,
-      };
-    },
-    setLoading: (state, action: PayloadAction<undefined>) => {
-      return {
-        ...state,
-        isLoading: true,
       };
     },
     setSuccess: (state, action: PayloadAction<boolean>) => {

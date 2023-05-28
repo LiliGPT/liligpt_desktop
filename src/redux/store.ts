@@ -1,13 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { currentProjectSlice } from '../redux/slices/currentProject';
+import { currentTestingSlice } from './slices/currentTesting';
 
 export const store = configureStore({
   devTools: true,
   preloadedState: {
     currentProject: currentProjectSlice.getInitialState(),
+    currentTesting: currentTestingSlice.getInitialState(),
   },
   reducer: {
     currentProject: currentProjectSlice.reducer,
+    currentTesting: currentTestingSlice.reducer,
   }
 });
 

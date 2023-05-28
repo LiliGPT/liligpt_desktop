@@ -15,8 +15,9 @@ fn main() {
     database::manager::create_database();
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            tauri_commands::open_project::open_project,
             tauri_commands::get_file_tree::get_file_tree,
+            tauri_commands::get_test_scripts::get_test_scripts,
+            tauri_commands::open_project::open_project,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
