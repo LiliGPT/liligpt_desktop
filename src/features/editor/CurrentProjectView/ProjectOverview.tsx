@@ -36,7 +36,6 @@ export function ProjectOverview() {
       <ul className="list-disc list-inside ml-1 mb-5">
         <li>Linguagem: {currentProject.codeLanguage}</li>
         <li>Framework: {currentProject.framework}</li>
-        <li>Padronização do código - Modular</li>
       </ul>
 
       <TestingStatus />

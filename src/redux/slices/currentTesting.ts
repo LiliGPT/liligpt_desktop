@@ -86,6 +86,12 @@ export const currentTestingSlice = createSlice({
         ],
       };
     },
+    closeCurrentTesting: (state, action: PayloadAction<undefined>) => {
+      return {
+        ...state,
+        ...initialState,
+      };
+    },
   },
 });
 
@@ -144,6 +150,10 @@ export const runTestCommand = (index: number) => async (dispatch: Dispatch, getS
     // dispatch(setError(e as Error));
     dispatch(setTestResultByIndex({ index, isSuccess: false, output: String(e) }));
   }
+}
+
+export const closeCurrentTesting = () => async (dispatch: Dispatch, getState: () => RootState) => {
+  dispatch(currentTestingSlice.actions.closeCurrentTesting());
 }
 
 // --- reducer

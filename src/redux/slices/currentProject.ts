@@ -1,6 +1,7 @@
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../redux/store';
 import { OptionalRenderTree, ProjectFromRust, rustGetFileTree, rustOpenProject } from '../../services/rust';
+import { closeCurrentTesting } from './currentTesting';
 
 // --- initial state
 
@@ -86,6 +87,12 @@ export const currentProjectSlice = createSlice({
         errorMessage: '',
       };
     },
+    closeCurrentProject: (state, action: PayloadAction<undefined>) => {
+      return {
+        ...state,
+        ...initialState,
+      };
+    },
   }
 });
 
@@ -124,6 +131,11 @@ export const loadRenderTreeThunk = () => async (dispatch: Dispatch, getState: ()
     // alert("[003j9] " + JSON.stringify(e));
     dispatch(setError(e as Error));
   }
+};
+
+export const closeCurrentProject = () => async (dispatch: Dispatch, getState: () => RootState) => {
+  dispatch(currentProjectSlice.actions.closeCurrentProject());
+  closeCurrentTesting()(dispatch, getState);
 };
 
 // --- reducer
