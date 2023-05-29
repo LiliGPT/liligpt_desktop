@@ -11,6 +11,8 @@ pub fn get_test_scripts(project_dir: String) -> Result<impl serde::Serialize, St
         .iter()
         // scriptKey starts with "test"
         .filter(|(key, _)| key.starts_with("test"))
+        // scriptKey is different than "test:cov"
+        .filter(|(key, _)| key.to_string() != "test:cov")
         // scriptValue contains the word "jest"
         .filter(|(_, value)| value.to_string().contains("jest"))
         // scriptValue does not contains the word "watch"
@@ -21,7 +23,7 @@ pub fn get_test_scripts(project_dir: String) -> Result<impl serde::Serialize, St
         .map(|(key, value)| {
             let re = regex::Regex::new(r"^(jest)|(\s+jest)").unwrap();
             let value = re
-                .replace_all(&value, "./node_modules/.bin/jest")
+                .replace_all(&value, " ./node_modules/.bin/jest")
                 .into_owned();
             (key, value)
         })

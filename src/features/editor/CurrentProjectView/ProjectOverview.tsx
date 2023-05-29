@@ -40,6 +40,7 @@ export function ProjectOverview() {
 
       <TestingStatus />
 
+      {/*
       <h2>Aplicações rodando</h2>
       <ul className="list-disc list-inside ml-1 mb-5 text-sm">
         <li>develop - https://develop.exemplo.com.br/api/v2 - {ver_logs}</li>
@@ -61,6 +62,7 @@ export function ProjectOverview() {
           <Button variant="contained" color="primary">Sugestões de melhoria</Button>
         </div>
       </div>
+      */}
     </div>
   );
 }
