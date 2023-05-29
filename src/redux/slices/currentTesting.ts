@@ -36,7 +36,7 @@ export const currentTestingSlice = createSlice({
   initialState,
   reducers: {
     setError: (state, action: PayloadAction<string | Error>) => {
-      const errorMessage: string = action.payload instanceof Error ? action.payload.message : action.payload;
+      const errorMessage: string = String(action.payload);
       return {
         ...state,
         errorMessage,
@@ -130,7 +130,7 @@ export const fetchCurrentTestingScripts = () => async (dispatch: Dispatch, getSt
       await runTestCommand(Number(i))(dispatch, getState);
     }
   } catch (e) {
-    dispatch(setError(e as Error));
+    dispatch(setError(String(e)));
   }
 }
 
@@ -142,18 +142,61 @@ export const runTestCommand = (index: number) => async (dispatch: Dispatch, getS
     const currentTesting = selectCurrentTesting(state);
     const { scriptKey, scriptValue } = currentTesting.scripts![index];
     const projectDir = selectProjectDir(state);
-    const output = await rustRunShellCommand(projectDir, `npm run ${scriptKey}`);
+    const output = await rustRunShellCommand(projectDir, `${scriptValue}`);
     dispatch(setTestResultByIndex({ index, isSuccess: true, output }));
     console.log(`runTestCommand success`);
   } catch (e: any) {
     console.log(`runTestCommand error `, e);
     // dispatch(setError(e as Error));
-    dispatch(setTestResultByIndex({ index, isSuccess: false, output: String(e) }));
+    dispatch(setTestResultByIndex({ index, isSuccess: false, output: _parseTestErrorOutput(e) }));
   }
 }
 
 export const closeCurrentTesting = () => async (dispatch: Dispatch, getState: () => RootState) => {
   dispatch(currentTestingSlice.actions.closeCurrentTesting());
+}
+
+function _parseTestErrorOutput(output: any) {
+  let newOutput = String(output);
+  // catch code errors
+  if (Error.prototype.isPrototypeOf(output)) {
+    return newOutput;
+  }
+  // catch non jest errors
+  if (!newOutput.includes('Test Suites:')) {
+    return newOutput;
+  }
+  // remove all color codes
+  newOutput = newOutput.replace(/\x1b\[[0-9;]*m/g, '');
+  // remove all \r
+  newOutput = newOutput.replace(/\r/g, '');
+  // split each test result individually
+  const splitString = '\n  ● ';
+  let testResultArray: string[] = newOutput.split(splitString);
+  // remove first element
+  testResultArray = testResultArray.slice(1);
+  // the last element will have coverage results, let's remove the coverage
+  testResultArray.push(testResultArray.pop()!.split('\n\n--')[0]);
+  // parse each test result
+  for (const i in testResultArray) {
+    let individualResult: string = testResultArray[i];
+    if (individualResult.includes('error TS')) {
+      individualResult = individualResult.split('\n\n')[1];
+    } else {
+      // first, lets remove the first and last parts (separated by \n\n)
+      const splitString = '\n\n';
+      const splitResult = individualResult.split(splitString);
+      splitResult.shift();
+      splitResult.pop();
+      individualResult = splitResult.join(splitString);
+    }
+    // add the result back
+    testResultArray[i] = individualResult;
+  }
+  // lets get the first two tests
+  testResultArray = testResultArray.slice(0, 1);
+
+  return testResultArray.join("\n\n  ------------------  \n\n");
 }
 
 // --- reducer

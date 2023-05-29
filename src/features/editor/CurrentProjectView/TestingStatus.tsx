@@ -53,7 +53,7 @@ export function TestingStatus() {
         let testResult;
         if (script.isSuccess !== null) {
           testResult = script.isSuccess === false ? (
-            <span className="text-red-500">{' - '}{script.output}</span>
+            <pre className="text-red-500 text-xs whitespace-break-spaces">{script.output}</pre>
           ) : (
             <></>
           );
@@ -71,7 +71,7 @@ export function TestingStatus() {
             <span>{script.scriptKey}</span>{coverageContent}
             {script.isSuccess === false && (<>
               <br />
-              <span className="text-gray-400 text-xs">{script.scriptValue}</span>
+              <span className="text-gray-500 text-xs">{script.scriptValue}</span>
             </>)}
             <br />
             {testResult}
@@ -107,7 +107,7 @@ export function TestingStatus() {
   }
 
   return (
-    <div className="relative bg-gray-100 text-gray-900 text-sm p-2 pl-3 pb-3 rounded-md mb-3">
+    <div className="relative bg-gray-200 text-gray-900 text-sm p-2 pl-3 pb-3 rounded-md mb-3">
       <div className="absolute right-2 top-1.5">
         <span onClick={() => { }}>
           <SvgIcon component={ConfigIcon} fontSize='small' />

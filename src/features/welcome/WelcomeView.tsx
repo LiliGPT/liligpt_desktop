@@ -35,9 +35,14 @@ export function WelcomeView() {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <Button variant="contained" onClick={onClickOpenProject}>Open Project</Button>
-      Pick a project to start working on!
+    <div className="flex flex-col justify-center items-center h-screen">
+      <h1>Pick a project to start working on!</h1>
+      <button
+        className="bg-gray-200 hover:bg-gray-300 focus:bg-gray-300 text-gray-700 font-bold py-1 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-400"
+        onClick={onClickOpenProject}
+      >
+        Open Project
+      </button>
     </div>
   );
 }

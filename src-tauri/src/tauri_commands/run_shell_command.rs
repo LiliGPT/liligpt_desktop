@@ -6,16 +6,14 @@ pub async fn run_shell_command(
     cwd: String,
     command: String,
 ) -> Result<impl serde::Serialize, String> {
-    // todo next
-    // - create this run_shell_command
-    // - call this run_shell_command from the frontend (inside a foreach testScript) - redux/slices/currentTesting.js @ 89
-    // doing
-    // this output was not considering cwd
-    // let output = std::process::Command::new("bash")
-    //     .arg("-c")
-    //     .arg(&command)
+    // new version
+    // let vec_command = command.split(" ").collect::<Vec<&str>>();
+    // let output = std::process::Command::new(vec_command[0])
+    //     .args(&vec_command[1..])
+    //     .current_dir(cwd)
     //     .output()
     //     .expect(format!("failed to execute command: {}", command).as_str());
+    // old version
     let output = std::process::Command::new("bash")
         .arg("-c")
         .arg(&command)
@@ -28,25 +26,6 @@ pub async fn run_shell_command(
         return Ok(stdout);
     }
     let stderr = String::from_utf8(output.stderr).unwrap();
-    let stderr = parse_error_message(stderr);
+    // let stderr = parse_error_message(stderr);
     Err(stderr)
-}
-
-fn parse_error_message(stdout: String) -> String {
-    // let re = stdout.split_whitespace().nth(1).unwrap();
-    // re.to_owned()
-    let start_index = match stdout.find("FAIL") {
-        Some(index) => index,
-        None => {
-            return stdout;
-        }
-    };
-
-    let end_index = match stdout.find("●") {
-        Some(index) => index,
-        None => stdout.len(),
-    };
-
-    let value = &stdout[start_index..end_index];
-    value.to_owned()
 }

@@ -5,7 +5,13 @@ export default {
     "./src/**/*.{ts,tsx}"
   ],
   theme: {
-    extend: {},
+    //colors: {
+    //  'app-bg': '#EFEFEF',
+    //  'app-text': '#666',
+    //  'icon': '#343746',
+    //  'label': '#191A21',
+    //  'accent': '#DA6BAD',
+    //},
   },
   plugins: [],
 }

@@ -73,3 +73,16 @@ export function rustRunShellCommand(cwd: string, command: string): Promise<strin
     });
   });
 }
+
+export function rustRunNpmScript(cwd: string, script_name: string, args: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const request = { cwd, script_name, args };
+    invoke("run_npm_script", request).then(response => {
+      console.log(`[rustRunNpmScript]`, { request, response })
+      resolve(response as string);
+    }).catch(error => {
+      console.log(`[rustRunNpmScript]`, { request, error })
+      reject(error);
+    });
+  });
+}
