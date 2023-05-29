@@ -4,7 +4,6 @@
 
 mod code_analyst;
 mod database;
-mod frameworks;
 mod io;
 mod project;
 mod tauri_commands;

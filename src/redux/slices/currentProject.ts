@@ -11,6 +11,7 @@ export interface CurrentProjectState {
   codeLanguage: string;
   framework: string;
   renderTree: OptionalRenderTree;
+  dependenciesInstalled: boolean | undefined;
   errorMessage: string;
   isLoading: boolean;
   isSuccess: boolean;
@@ -23,6 +24,7 @@ const initialState: CurrentProjectState = {
   codeLanguage: '',
   framework: '',
   renderTree: undefined,
+  dependenciesInstalled: undefined,
   isLoading: false,
   isSuccess: false,
 };
@@ -62,6 +64,7 @@ export const currentProjectSlice = createSlice({
         projectDir: action.payload.project_dir,
         codeLanguage: action.payload.code_language,
         framework: action.payload.framework,
+        dependenciesInstalled: action.payload.dependencies_installed,
       };
     },
     setProjectDir: (state, action: PayloadAction<string>) => {

@@ -4,6 +4,7 @@ export interface ProjectFromRust {
   project_dir: string;
   code_language: string;
   framework: string;
+  dependencies_installed: boolean;
 }
 
 export function rustOpenProject(): Promise<ProjectFromRust> {

@@ -36,9 +36,10 @@ export function ProjectOverview() {
       <ul className="list-disc list-inside ml-1 mb-5">
         <li>Linguagem: {currentProject.codeLanguage}</li>
         <li>Framework: {currentProject.framework}</li>
+        <li>Dependências Instaladas: {currentProject.dependenciesInstalled ? 'Sim' : 'Não'}</li>
       </ul>
 
-      <TestingStatus />
+      {currentProject.dependenciesInstalled && <TestingStatus />}
 
       {/*
       <h2>Aplicações rodando</h2>

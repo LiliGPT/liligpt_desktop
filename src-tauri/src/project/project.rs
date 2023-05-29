@@ -19,20 +19,32 @@ impl Project {
         &self,
         code_language: &crate::code_analyst::types::CodeLanguage,
     ) -> Result<crate::code_analyst::types::Framework, String> {
-        return Ok(crate::code_analyst::framework::detect_framework_from_path(
+        return Ok(crate::code_analyst::frameworks::detect_framework_from_path(
             &self.project_dir,
             code_language,
         ));
+    }
+
+    fn get_dependencies_installed(
+        &self,
+        code_language: &crate::code_analyst::types::CodeLanguage,
+    ) -> Result<bool, String> {
+        return Ok(crate::code_analyst::frameworks::is_dependencies_installed(
+            &self.project_dir,
+            &code_language,
+        )?);
     }
 
     pub fn to_json(&self) -> Result<impl serde::Serialize, String> {
         // todo: should be a project where we can save in database?
         let code_language = self.get_code_language()?;
         let framework = self.get_framework(&code_language)?;
+        let dependencies_installed = self.get_dependencies_installed(&code_language)?;
         return Ok(serde_json::json!({
           "project_dir": &self.project_dir,
           "code_language": code_language.to_string(),
           "framework": framework.to_string(),
+          "dependencies_installed": dependencies_installed,
         }));
     }
 }
