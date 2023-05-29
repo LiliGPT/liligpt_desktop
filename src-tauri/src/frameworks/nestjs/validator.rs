@@ -1,3 +1,4 @@
+#[deprecated(note = "I can use the functions from code_analyst folder")]
 pub fn is_valid_project(project_path: &str) -> Result<(), String> {
     // check if package.json exists
     let package_json_path = project_path.to_string() + "/package.json";
