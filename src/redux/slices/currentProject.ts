@@ -1,6 +1,6 @@
 import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../redux/store';
-import { OptionalRenderTree, ProjectFromRust, rustGetFileTree, rustOpenProject } from '../../services/rust';
+import { OptionalRenderTree, ProjectFromRust, rustGetFileTree, rustInstallDependencies, rustOpenProject } from '../../services/rust';
 import { closeCurrentTesting } from './currentTesting';
 
 // --- initial state
@@ -11,7 +11,11 @@ export interface CurrentProjectState {
   codeLanguage: string;
   framework: string;
   renderTree: OptionalRenderTree;
-  dependenciesInstalled: boolean | undefined;
+  dependencies: {
+    isInstalled: boolean | undefined;
+    isLoading: boolean;
+    errorMessage: string;
+  };
   errorMessage: string;
   isLoading: boolean;
   isSuccess: boolean;
@@ -24,7 +28,11 @@ const initialState: CurrentProjectState = {
   codeLanguage: '',
   framework: '',
   renderTree: undefined,
-  dependenciesInstalled: undefined,
+  dependencies: {
+    isInstalled: undefined,
+    isLoading: false,
+    errorMessage: '',
+  },
   isLoading: false,
   isSuccess: false,
 };
@@ -64,7 +72,11 @@ export const currentProjectSlice = createSlice({
         projectDir: action.payload.project_dir,
         codeLanguage: action.payload.code_language,
         framework: action.payload.framework,
-        dependenciesInstalled: action.payload.dependencies_installed,
+        dependencies: {
+          isInstalled: action.payload.dependencies_installed,
+          isLoading: false,
+          errorMessage: '',
+        },
       };
     },
     setProjectDir: (state, action: PayloadAction<string>) => {
@@ -96,7 +108,40 @@ export const currentProjectSlice = createSlice({
         ...initialState,
       };
     },
-  }
+    setDependenciesLoading: (state, action: PayloadAction<undefined>) => {
+      return {
+        ...state,
+        dependencies: {
+          ...state.dependencies,
+          isInstalled: undefined,
+          isLoading: true,
+          errorMessage: '',
+        },
+      };
+    },
+    setDependenciesInstalled: (state, action: PayloadAction<boolean>) => {
+      return {
+        ...state,
+        dependencies: {
+          ...state.dependencies,
+          isInstalled: action.payload,
+          isLoading: false,
+          errorMessage: '',
+        },
+      };
+    },
+    setDependenciesErrorMessage: (state, action: PayloadAction<string>) => {
+      return {
+        ...state,
+        dependencies: {
+          ...state.dependencies,
+          isInstalled: false,
+          isLoading: false,
+          errorMessage: action.payload,
+        },
+      };
+    },
+  },
 });
 
 // --- selectors
@@ -139,6 +184,17 @@ export const loadRenderTreeThunk = () => async (dispatch: Dispatch, getState: ()
 export const closeCurrentProject = () => async (dispatch: Dispatch, getState: () => RootState) => {
   dispatch(currentProjectSlice.actions.closeCurrentProject());
   closeCurrentTesting()(dispatch, getState);
+};
+
+export const installDependenciesThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {
+  try {
+    dispatch(currentProjectSlice.actions.setDependenciesLoading());
+    const projectDir = selectProjectDir(getState());
+    await rustInstallDependencies(projectDir);
+    dispatch(currentProjectSlice.actions.setDependenciesInstalled(true));
+  } catch (e) {
+    dispatch(currentProjectSlice.actions.setDependenciesErrorMessage(String(e)));
+  }
 };
 
 // --- reducer

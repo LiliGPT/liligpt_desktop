@@ -75,14 +75,14 @@ export function rustRunShellCommand(cwd: string, command: string): Promise<strin
   });
 }
 
-export function rustRunNpmScript(cwd: string, script_name: string, args: string): Promise<string> {
+export function rustInstallDependencies(cwd: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const request = { cwd, script_name, args };
-    invoke("run_npm_script", request).then(response => {
-      console.log(`[rustRunNpmScript]`, { request, response })
-      resolve(response as string);
+    const request = { cwd };
+    invoke("install_dependencies", request).then(response => {
+      console.log(`[rustInstallDependencies]`, { request, response })
+      resolve();
     }).catch(error => {
-      console.log(`[rustRunNpmScript]`, { request, error })
+      console.log(`[rustInstallDependencies]`, { request, error })
       reject(error);
     });
   });

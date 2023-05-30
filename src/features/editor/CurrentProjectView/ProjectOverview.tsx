@@ -1,15 +1,19 @@
 import { notification } from "@tauri-apps/api";
-import { selectCurrentProject } from "../../../redux/slices/currentProject"
-import { useAppSelector } from "../../../redux/hooks"
+import { installDependenciesThunk, selectCurrentProject } from "../../../redux/slices/currentProject"
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks"
 import { Button } from "@mui/material";
 import { TestingStatus } from "./TestingStatus";
 
 export function ProjectOverview() {
   const currentProject = useAppSelector(selectCurrentProject);
+  const dispatch = useAppDispatch();
 
-  const onClickConfigButton = async () => {
-    alert('TODO: open config modal');
+  const onClickInstallDependencies = async () => {
+    dispatch(installDependenciesThunk());
   };
+
+  const allowedLanguages = ['NodeTs', 'NodeJs'];
+  const testsEnabled: boolean = currentProject.dependencies.isInstalled && allowedLanguages.includes(currentProject.codeLanguage) || false;
 
   // header will be horizontal with title <h1/> and a clickable config icon in the right
   const header = (
@@ -29,6 +33,17 @@ export function ProjectOverview() {
     </>
   );
 
+  let dependencyAction;
+  if (currentProject.dependencies.isLoading) {
+    dependencyAction = (
+      <span className="text-orange-400 italic text-xs">instalando...</span>
+    );
+  } else if (!currentProject.dependencies.isInstalled) {
+    dependencyAction = (
+      <Button variant="text" color="primary" onClick={onClickInstallDependencies}>Instalar</Button>
+    );
+  }
+
   return (
     <div className="w-full p-2">
       {header}
@@ -36,10 +51,13 @@ export function ProjectOverview() {
       <ul className="list-disc list-inside ml-1 mb-5">
         <li>Linguagem: {currentProject.codeLanguage}</li>
         <li>Framework: {currentProject.framework}</li>
-        <li>Dependências Instaladas: {currentProject.dependenciesInstalled ? 'Sim' : 'Não'}</li>
+        <li>
+          Dependências Instaladas: {currentProject.dependencies.isInstalled ? 'Sim' : 'Não'}
+          {dependencyAction}
+        </li>
       </ul>
 
-      {currentProject.dependenciesInstalled && <TestingStatus />}
+      {testsEnabled && <TestingStatus />}
 
       {/*
       <h2>Aplicações rodando</h2>

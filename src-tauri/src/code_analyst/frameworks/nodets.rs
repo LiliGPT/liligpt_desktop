@@ -82,13 +82,3 @@ fn is_valid_tauri_project(project_path: &str) -> Result<(), String> {
     // return ok
     Ok(())
 }
-
-pub fn is_dependencies_installed(project_path: &str) -> bool {
-    // check if folder node_modules exists
-    let node_modules_path = project_path.to_string() + "/node_modules";
-    let node_modules_path = std::path::Path::new(&node_modules_path);
-    if false == node_modules_path.exists() {
-        return false;
-    };
-    return true;
-}

@@ -31,12 +31,12 @@ pub fn is_dependencies_installed(
 ) -> Result<bool, String> {
     match language {
         super::types::CodeLanguage::NodeJs => {
-            return Ok(super::frameworks::nodets::is_dependencies_installed(
+            return Ok(super::dependencies::nodets::is_dependencies_installed(
                 project_dir,
             ));
         }
         super::types::CodeLanguage::NodeTs => {
-            return Ok(super::frameworks::nodets::is_dependencies_installed(
+            return Ok(super::dependencies::nodets::is_dependencies_installed(
                 project_dir,
             ));
         }

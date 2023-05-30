@@ -18,6 +18,7 @@ fn main() {
             tauri_commands::get_test_scripts::get_test_scripts,
             tauri_commands::open_project::open_project,
             tauri_commands::run_shell_command::run_shell_command,
+            tauri_commands::install_dependencies::install_dependencies,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -11,7 +11,7 @@ impl Project {
 
     fn get_code_language(&self) -> Result<crate::code_analyst::types::CodeLanguage, String> {
         return Ok(
-            crate::code_analyst::code_language::detect_code_language_from_path(&self.project_dir)?,
+            crate::code_analyst::languages::detect_code_language_from_path(&self.project_dir)?,
         );
     }
 
