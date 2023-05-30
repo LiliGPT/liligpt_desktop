@@ -6,9 +6,9 @@ import { message } from '@tauri-apps/api/dialog';
 import { ProjectFromRust } from "../../services/rust";
 import { shell } from "@tauri-apps/api";
 import { useEffect } from "react";
-import { runLocalServerThunk } from "../../redux/slices/localServers";
+import { LocalServerLogBlock, addLogToLocalServer, openLocalServerThunk, runLocalServerThunk } from "../../redux/slices/localServers";
 
-const ENABLE_INITIAL_DISPATCHER = false;
+const ENABLE_INITIAL_DISPATCHER = true;
 
 // this function was created to start the app in a desired state
 function _InitialDispatcher() {
@@ -22,8 +22,23 @@ function _InitialDispatcher() {
         local_server_commands: ['npm run start:dev'],
         project_dir: '/home/l/sample-projects/nestjs-example-project',
       };
+      // open the project
       await dispatch(openProjectThunk(project));
+      // start running the command line
       await dispatch(runLocalServerThunk('npm run start:dev'));
+      // open the screen/dialog to see details about the local server
+      await dispatch(openLocalServerThunk('npm run start:dev'));
+      // add a log to the local server
+      const log: LocalServerLogBlock = {
+        message: 'Starting server...',
+        timestamp: new Date().toISOString(),
+        id: 1,
+        type: 'internal',
+      }
+      await dispatch(addLogToLocalServer({
+        log,
+        serverName: 'npm run start:dev',
+      }));
     }
     run();
   });

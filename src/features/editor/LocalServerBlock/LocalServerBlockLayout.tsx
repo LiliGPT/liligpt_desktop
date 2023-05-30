@@ -4,6 +4,7 @@ import DebugIcon from '@mui/icons-material/PlayCircle';
 import StopIcon from '@mui/icons-material/Stop';
 import { LocalServer, runLocalServerThunk, stopLocalServerThunk } from '../../../redux/slices/localServers';
 import { useAppDispatch } from '../../../redux/hooks';
+import { OpenedLocalServer } from './OpenedLocalServer';
 
 interface Props {
   servers: LocalServer[];
@@ -53,6 +54,8 @@ export function LocalServerBlockLayout({ servers }: Props) {
           </div>
         );
       })}
+
+      <OpenedLocalServer />
     </div>
   )
 }
