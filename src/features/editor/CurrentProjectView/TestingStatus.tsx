@@ -59,7 +59,7 @@ export function TestingStatus() {
           <div className={`w-2 h-2 rounded-full ${testStatusColor} inline-block mr-2`}></div>
         );
         return (
-          <div className="p-0.5">
+          <div className="p-0.5" key={script.scriptValue}>
             {testStatus}
             <span>{script.scriptKey}</span>{coverageContent}
             {script.isSuccess === false && (<>

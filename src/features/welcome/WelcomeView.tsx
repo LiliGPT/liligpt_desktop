@@ -5,9 +5,30 @@ import { openProjectThunk } from "../../redux/slices/currentProject";
 import { message } from '@tauri-apps/api/dialog';
 import { ProjectFromRust } from "../../services/rust";
 import { shell } from "@tauri-apps/api";
+import { useEffect } from "react";
+import { runLocalServerThunk } from "../../redux/slices/localServers";
 
-// todo: refactor this
-// todo: move this and the invoke to a dispatch
+const ENABLE_INITIAL_DISPATCHER = false;
+
+// this function was created to start the app in a desired state
+function _InitialDispatcher() {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    async function run() {
+      const project: ProjectFromRust = {
+        code_language: 'NodeTs',
+        framework: 'NodeNest',
+        dependencies_installed: true,
+        local_server_commands: ['npm run start:dev'],
+        project_dir: '/home/l/sample-projects/nestjs-example-project',
+      };
+      await dispatch(openProjectThunk(project));
+      await dispatch(runLocalServerThunk('npm run start:dev'));
+    }
+    run();
+  });
+  return <></>;
+}
 
 
 export function WelcomeView() {
@@ -57,6 +78,8 @@ export function WelcomeView() {
       >
         Run shell test
       </button>
+
+      {ENABLE_INITIAL_DISPATCHER && <_InitialDispatcher />}
     </div>
   );
 }

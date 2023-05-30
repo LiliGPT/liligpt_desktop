@@ -3,9 +3,7 @@ import { installDependenciesThunk, selectCurrentProject } from "../../../redux/s
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks"
 import { Button } from "@mui/material";
 import { TestingStatus } from "./TestingStatus";
-import PlayIcon from '@mui/icons-material/PlayArrow';
-import DebugIcon from '@mui/icons-material/PlayCircle';
-import StopIcon from '@mui/icons-material/Stop';
+import { LocalServerBlock } from "../LocalServerBlock";
 
 export function ProjectOverview() {
   const currentProject = useAppSelector(selectCurrentProject)!;
@@ -59,11 +57,9 @@ export function ProjectOverview() {
           {' '}
           {dependencyAction}
         </li>
-        <li>
-          Servidor local:
-          <PlayIcon /> <DebugIcon /> <StopIcon />
-        </li>
       </ul>
+
+      <LocalServerBlock />
 
       {testsEnabled && <TestingStatus />}
 

@@ -55,7 +55,7 @@ impl Project {
         let code_language = self.get_code_language()?;
         let framework = self.get_framework(&code_language)?;
         let dependencies_installed = self.get_dependencies_installed(&code_language)?;
-        let local_server_command = self.get_local_server_commands(&code_language, &framework);
+        let local_server_commands = self.get_local_server_commands(&code_language, &framework);
         // after adding fields here
         // I should update React
         //
@@ -64,7 +64,7 @@ impl Project {
           "code_language": code_language.to_string(),
           "framework": framework.to_string(),
           "dependencies_installed": dependencies_installed,
-          "local_server_command": local_server_command,
+          "local_server_commands": local_server_commands,
         }));
     }
 }

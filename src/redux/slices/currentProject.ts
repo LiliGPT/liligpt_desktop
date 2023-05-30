@@ -2,6 +2,7 @@ import { createSlice, Dispatch, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../redux/store';
 import { OptionalRenderTree, ProjectFromRust, rustGetFileTree, rustInstallDependencies, rustOpenProject } from '../../services/rust';
 import { closeCurrentTesting, fetchCurrentTestingScriptsThunk } from './currentTesting';
+import { addLocalServerCommandsThunk } from './localServers';
 
 // --- initial state
 
@@ -12,6 +13,7 @@ interface EditorProject {
   codeLanguage: string;
   framework: string;
   renderTree: OptionalRenderTree;
+  localServerCommands: string[];
   dependencies: {
     isInstalled: boolean | undefined;
     isLoading: boolean;
@@ -161,6 +163,7 @@ export const currentProjectSlice = createSlice({
           codeLanguage: action.payload.code_language,
           framework: action.payload.framework,
           renderTree: undefined,
+          localServerCommands: action.payload.local_server_commands,
           dependencies: {
             isInstalled: action.payload.dependencies_installed,
             isLoading: false,
@@ -307,6 +310,14 @@ export const selectCurrentProject = (state: RootState): EditorProject | undefine
 export const selectProjectDir = (state: RootState): string => selectCurrentProject(state)?.projectDir ?? '';
 // export const selectRenderTree = (state: RootState): RenderTree | undefined => state.currentProject.renderTree;
 
+export const selectCurrentProjectLocalServerCommands = (state: RootState): string[] => {
+  const project = selectCurrentProject(state);
+  if (!project) {
+    return [];
+  }
+  return project.localServerCommands;
+}
+
 // --- actions
 
 export const { setRenderTree, setError, setLoading } = currentProjectSlice.actions;
@@ -321,21 +332,21 @@ export const addNotificationThunk = (notification: EditorNotification, time = 50
   }, time);
 };
 
-export const openProjectThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {
+export const openProjectThunk = (project?: ProjectFromRust) => async (dispatch: Dispatch, getState: () => RootState) => {
   try {
     addNotificationThunk({
       id: 'open-project',
       message: 'Opening project...',
       type: 'loading',
     })(dispatch, getState);
-
-    const projectFromRust = await rustOpenProject();
+    const projectFromRust = project ?? await rustOpenProject();
     dispatch(currentProjectSlice.actions.setProjectFromRust(projectFromRust));
     // const tree = await rustGetFileTree(projectFromRust.project_dir);
     // dispatch(setRenderTree(tree));
     closeCurrentTesting()(dispatch, getState);
     loadRenderTreeThunk()(dispatch, getState);
     fetchCurrentTestingScriptsThunk()(dispatch, getState);
+    addLocalServerCommandsThunk(projectFromRust.local_server_commands)(dispatch, getState);
   } catch (e) {
     dispatch(setError(e as Error));
   }
@@ -346,6 +357,8 @@ export const setCurrentTabIdThunk = (tabId: string) => async (dispatch: Dispatch
   closeCurrentTesting()(dispatch, getState);
   loadRenderTreeThunk()(dispatch, getState);
   fetchCurrentTestingScriptsThunk()(dispatch, getState);
+  const currentProject = selectCurrentProject(getState())!;
+  addLocalServerCommandsThunk(currentProject.localServerCommands)(dispatch, getState);
 };
 
 export const loadRenderTreeThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {
@@ -368,16 +381,24 @@ export const closeCurrentProjectThunk = () => async (dispatch: Dispatch, getStat
 
 export const closeProjectByTabIdThunk = (tabId: string) => async (dispatch: Dispatch, getState: () => RootState) => {
   const state = getState();
+  // get project by tabId
   const project: EditorProject | undefined = selectEditorTabs(state).find((tab) => tab.id === tabId);
   if (!project) {
     throw new Error(`closeProjectByTabIdThunk - tabId not found: ${tabId}`);
   }
-  const currentTabId: string = state.currentProject.currentTabId;
-  const isCurrent = currentTabId === tabId;
-  dispatch(currentProjectSlice.actions.closeProjectByTabId(tabId));
-  if (isCurrent) {
-    closeCurrentTesting()(dispatch, getState);
+  // close current tab
+  // const currentTabId: string = state.currentProject.currentTabId;
+  // const isCurrent = currentTabId === tabId;
+  // await dispatch(currentProjectSlice.actions.closeProjectByTabId(tabId));
+  // if (isCurrent) {
+  //   await closeCurrentTesting()(dispatch, getState);
+  // }
+  // set next tab
+  const newTabs = selectEditorTabs(getState());
+  if (newTabs.length === 0) {
+    return;
   }
+  setCurrentTabIdThunk(newTabs[0].id)(dispatch, getState);
 }
 
 export const installDependenciesThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {
@@ -385,9 +406,9 @@ export const installDependenciesThunk = () => async (dispatch: Dispatch, getStat
     dispatch(currentProjectSlice.actions.setDependenciesLoading());
     const projectDir = selectProjectDir(getState());
     await rustInstallDependencies(projectDir);
-    dispatch(currentProjectSlice.actions.setDependenciesInstalled(true));
+    await dispatch(currentProjectSlice.actions.setDependenciesInstalled(true));
   } catch (e) {
-    dispatch(currentProjectSlice.actions.setDependenciesErrorMessage(String(e)));
+    await dispatch(currentProjectSlice.actions.setDependenciesErrorMessage(String(e)));
   }
 };
 
