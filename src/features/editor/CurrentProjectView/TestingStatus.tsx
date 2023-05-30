@@ -1,17 +1,10 @@
 import ConfigIcon from '@mui/icons-material/Settings';
 import { CircularProgress, SvgIcon } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { fetchCurrentTestingScripts, selectCurrentTesting } from '../../../redux/slices/currentTesting';
-import { useEffect } from 'react';
+import { useAppSelector } from '../../../redux/hooks';
+import { selectCurrentTesting } from '../../../redux/slices/currentTesting';
 
 export function TestingStatus() {
-  const dispatch = useAppDispatch();
   const currentTesting = useAppSelector(selectCurrentTesting);
-
-  useEffect(() => {
-    dispatch(fetchCurrentTestingScripts());
-  }, []);
-
 
   let content;
 

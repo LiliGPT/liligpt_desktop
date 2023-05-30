@@ -1,16 +1,16 @@
 import { Button } from "@mui/material";
 import { FileSystemTree } from "../FileSystemTree";
 import { useAppDispatch } from "../../../redux/hooks";
-import { closeCurrentProject, openProjectThunk } from "../../../redux/slices/currentProject";
+import { closeCurrentProjectThunk, openProjectThunk } from "../../../redux/slices/currentProject";
 
 export function ProjectSidebar() {
   const dispatch = useAppDispatch();
   const onCloseProject = () => {
-    dispatch(closeCurrentProject());
+    dispatch(closeCurrentProjectThunk());
   };
 
   const onClickOpenProject = () => {
-    dispatch(closeCurrentProject());
+    dispatch(closeCurrentProjectThunk());
     setTimeout(() => {
       dispatch(openProjectThunk());
     }, 500);

@@ -35,16 +35,36 @@ impl Project {
         )?);
     }
 
+    fn get_local_server_commands(
+        &self,
+        code_language: &crate::code_analyst::types::CodeLanguage,
+        framework: &crate::code_analyst::types::Framework,
+    ) -> Vec<String> {
+        match crate::code_analyst::frameworks::get_local_server_commands(
+            &self.project_dir,
+            &code_language,
+            &framework,
+        ) {
+            Ok(commands) => commands,
+            Err(err) => vec![],
+        }
+    }
+
     pub fn to_json(&self) -> Result<impl serde::Serialize, String> {
         // todo: should be a project where we can save in database?
         let code_language = self.get_code_language()?;
         let framework = self.get_framework(&code_language)?;
         let dependencies_installed = self.get_dependencies_installed(&code_language)?;
+        let local_server_command = self.get_local_server_commands(&code_language, &framework);
+        // after adding fields here
+        // I should update React
+        //
         return Ok(serde_json::json!({
           "project_dir": &self.project_dir,
           "code_language": code_language.to_string(),
           "framework": framework.to_string(),
           "dependencies_installed": dependencies_installed,
+          "local_server_command": local_server_command,
         }));
     }
 }

@@ -3,9 +3,12 @@ import { installDependenciesThunk, selectCurrentProject } from "../../../redux/s
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks"
 import { Button } from "@mui/material";
 import { TestingStatus } from "./TestingStatus";
+import PlayIcon from '@mui/icons-material/PlayArrow';
+import DebugIcon from '@mui/icons-material/PlayCircle';
+import StopIcon from '@mui/icons-material/Stop';
 
 export function ProjectOverview() {
-  const currentProject = useAppSelector(selectCurrentProject);
+  const currentProject = useAppSelector(selectCurrentProject)!;
   const dispatch = useAppDispatch();
 
   const onClickInstallDependencies = async () => {
@@ -53,7 +56,12 @@ export function ProjectOverview() {
         <li>Framework: {currentProject.framework}</li>
         <li>
           Dependências Instaladas: {currentProject.dependencies.isInstalled ? 'Sim' : 'Não'}
+          {' '}
           {dependencyAction}
+        </li>
+        <li>
+          Servidor local:
+          <PlayIcon /> <DebugIcon /> <StopIcon />
         </li>
       </ul>
 

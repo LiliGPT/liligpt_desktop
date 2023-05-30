@@ -14,8 +14,14 @@
     "allowlist": {
       "all": false,
       "shell": {
-        "all": false,
-        "open": true
+        "all": true,
+        "scope": [
+          {
+            "name": "bash",
+            "cmd": "/usr/bin/bash",
+            "args": true
+          }
+        ]
       },
       "dialog": {
         "all": true,

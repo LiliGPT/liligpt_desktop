@@ -45,3 +45,14 @@ pub fn is_dependencies_installed(
         }
     }
 }
+
+pub fn get_local_server_commands(
+    project_dir: &str,
+    code_language: &super::types::CodeLanguage,
+    framework: &super::types::Framework,
+) -> Result<Vec<String>, String> {
+    match framework {
+        super::types::Framework::NodeNest => Ok(vec!["npm run start:dev".to_string()]),
+        _ => Err("unknown server command".to_string()),
+    }
+}

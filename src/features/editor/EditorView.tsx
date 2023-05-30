@@ -4,6 +4,7 @@ import { selectProjectDir } from "../../redux/slices/currentProject";
 import { WelcomeView } from "../welcome/WelcomeView";
 import { CurrentProjectView } from "./CurrentProjectView";
 import { ProjectSettingsView } from "./ProjectSettingsView";
+import EditorTabs from "./EditorTabs";
 
 enum EditorScreen {
   Overview,
@@ -18,7 +19,13 @@ export function EditorView() {
   const openOverview = () => setScreen(EditorScreen.Overview);
 
   if (screen === EditorScreen.Overview) {
-    return <CurrentProjectView onClickConfigButton={openSettings} />;
+    if (!useAppSelector(selectProjectDir)) {
+      return <WelcomeView />;
+    }
+    return <>
+      <EditorTabs />
+      <CurrentProjectView onClickConfigButton={openSettings} />
+    </>;
   }
 
   if (screen === EditorScreen.Settings) {

@@ -105,7 +105,7 @@ export const { setCurrentTestingSlice, setLoading, setError, setTestResultByInde
 
 // --- thunks
 
-export const fetchCurrentTestingScripts = () => async (dispatch: Dispatch, getState: () => RootState) => {
+export const fetchCurrentTestingScriptsThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {
   try {
     dispatch(setLoading());
     const projectDir = selectProjectDir(getState());
