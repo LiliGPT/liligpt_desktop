@@ -2,6 +2,7 @@ import { Dispatch, PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { ProjectFromRust, rustInstallDependencies, rustOpenProject } from "../../services/rust";
 import { ReduxNotificationType, addNotificationThunk } from "./notificationsSlice";
+import { fetchTestsFromProjectThunk } from "./testsSlice";
 
 interface ReduxProjectDependency {
   isInstalled: boolean | undefined;
@@ -59,8 +60,16 @@ export const projectsSlice = createSlice({
         throw new Error(`[projectsSlice.reducers.removeProject] Project not found: ${action.payload}`);
       }
       const newState = { ...state };
-      newState.projects.splice(foundIndex, 1);
-      return newState;
+      // newState.projects.splice(foundIndex, 1);
+      // return newState;
+      return {
+        ...newState,
+        projects: [
+          // remove 1 item
+          ...newState.projects.slice(0, foundIndex),
+          ...newState.projects.slice(foundIndex + 1),
+        ],
+      };
     },
     setDependenciesLoading: (state: ReduxProjectsState, action: PayloadAction<{ projectUid: string }>): ReduxProjectsState => {
       const foundIndex = state.projects.findIndex(project => project.projectUid === action.payload.projectUid);
@@ -68,10 +77,26 @@ export const projectsSlice = createSlice({
         throw new Error(`[projectsSlice.reducers.setDependenciesLoading] Project not found: ${action.payload.projectUid}`);
       }
       const newState = { ...state };
-      newState.projects[foundIndex].dependencies.isLoading = true;
-      newState.projects[foundIndex].dependencies.isInstalled = false;
-      newState.projects[foundIndex].dependencies.errorMessage = '';
-      return newState;
+      // newState.projects[foundIndex].dependencies.isLoading = true;
+      // newState.projects[foundIndex].dependencies.isInstalled = false;
+      // newState.projects[foundIndex].dependencies.errorMessage = '';
+      // return newState;
+      return {
+        ...newState,
+        projects: [
+          ...newState.projects.slice(0, foundIndex),
+          {
+            ...newState.projects[foundIndex],
+            dependencies: {
+              ...newState.projects[foundIndex].dependencies,
+              isLoading: true,
+              isInstalled: false,
+              errorMessage: '',
+            },
+          },
+          ...newState.projects.slice(foundIndex + 1),
+        ],
+      };
     },
     setDependenciesInstalled: (state: ReduxProjectsState, action: PayloadAction<{ projectUid: string }>): ReduxProjectsState => {
       const foundIndex = state.projects.findIndex(project => project.projectUid === action.payload.projectUid);
@@ -145,6 +170,7 @@ export const openProjectThunk = (project?: ProjectFromRust) => async (dispatch: 
     localServerCommands,
   }));
   await dispatch(projectsSlice.actions.setOpenedProjectUid(projectUid));
+  await fetchTestsFromProjectThunk(projectUid)(dispatch, getState);
 };
 
 export const closeProjectThunk = (projectUid: string) => async (dispatch: Dispatch, getState: () => RootState) => {

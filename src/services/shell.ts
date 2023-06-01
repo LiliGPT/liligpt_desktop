@@ -55,11 +55,17 @@ export async function shellSpawn({
   child.write(`${command}\n`);
   await delay(5000);
   // get the right pid
-  const pid = await rustRunShellCommand(cwd, `pgrep -P $(ps -ax | grep "${command}" | grep -v grep | tail -1 | awk '{print $1}')`);
+  let pid;
+  try {
+    pid = await rustRunShellCommand(cwd, `pgrep -P $(ps -ax | tail -10 | grep "${command}" | grep -v grep | tail -1 | awk '{print $1}')`);
+  } catch (err) {
+    console.log(`[shellSpawn] pid error: ${err}`);
+  }
   // console.log('pid ============ ', pid);
   // console.log(pid);
   if (!pid) {
-    throw new Error(`[shellSpawn] pid not found`);
+    // throw new Error(`[shellSpawn] pid not found`);
+    return 0;
   }
   return parseInt(pid);
   // setTimeout(async function __killChild(child: shell.Child) {

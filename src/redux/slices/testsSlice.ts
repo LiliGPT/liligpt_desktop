@@ -3,7 +3,7 @@ import { RootState } from "../store";
 import { selectProjectDir } from "./projectsSlice";
 import { rustGetTestScripts, rustRunShellCommand } from "../../services/rust";
 
-interface ReduxTest {
+export interface ReduxTest {
   testUid: string;
   projectUid: string;
   displayName: string;
@@ -25,7 +25,7 @@ export const testsSlice = createSlice({
   name: 'tests',
   initialState,
   reducers: {
-    addTest: (state: ReduxTestsState, action: PayloadAction<ReduxTest>) => {
+    addTest: (state: ReduxTestsState, action: PayloadAction<ReduxTest>): ReduxTestsState => {
       const newState = [...state];
       const foundIndex = newState.findIndex(test => test.testUid === action.payload.testUid);
       if (foundIndex > -1) {
@@ -34,7 +34,7 @@ export const testsSlice = createSlice({
       newState.push(action.payload);
       return newState;
     },
-    removeTest: (state: ReduxTestsState, action: PayloadAction<string>) => {
+    removeTest: (state: ReduxTestsState, action: PayloadAction<string>): ReduxTestsState => {
       const newState = [...state];
       const foundIndex = newState.findIndex(test => test.testUid === action.payload);
       if (foundIndex === -1) {
@@ -43,35 +43,65 @@ export const testsSlice = createSlice({
       newState.splice(foundIndex, 1);
       return newState;
     },
-    setTestLoading: (state: ReduxTestsState, action: PayloadAction<{ testUid: string }>) => {
+    setTestLoading: (state: ReduxTestsState, action: PayloadAction<{ testUid: string }>): ReduxTestsState => {
       const newState = [...state];
       const foundIndex = newState.findIndex(test => test.testUid === action.payload.testUid);
       if (foundIndex === -1) {
         throw new Error(`[testsSlice.reducers.setTestLoading] Test not found: ${action.payload.testUid}`);
       }
-      newState[foundIndex].isLoading = true;
-      newState[foundIndex].output = '';
-      return newState;
+      // newState[foundIndex].isLoading = true;
+      // newState[foundIndex].output = '';
+      // return newState;
+      return [
+        ...newState.slice(0, foundIndex),
+        {
+          ...newState[foundIndex],
+          isLoading: true,
+          isSuccess: false,
+          output: '',
+        },
+        ...newState.slice(foundIndex + 1),
+      ];
     },
-    setTestError: (state: ReduxTestsState, action: PayloadAction<{ testUid: string, output: string }>) => {
+    setTestError: (state: ReduxTestsState, action: PayloadAction<{ testUid: string, output: string }>): ReduxTestsState => {
       const newState = [...state];
       const foundIndex = newState.findIndex(test => test.testUid === action.payload.testUid);
       if (foundIndex === -1) {
         throw new Error(`[testsSlice.reducers.setTestError] Test not found: ${action.payload.testUid}`);
       }
-      newState[foundIndex].output = action.payload.output;
-      newState[foundIndex].isLoading = false;
-      return newState;
+      // newState[foundIndex].output = action.payload.output;
+      // newState[foundIndex].isLoading = false;
+      // return newState;
+      return [
+        ...newState.slice(0, foundIndex),
+        {
+          ...newState[foundIndex],
+          isLoading: false,
+          output: action.payload.output,
+          isSuccess: false,
+        },
+        ...newState.slice(foundIndex + 1),
+      ];
     },
-    setTestOutput: (state: ReduxTestsState, action: PayloadAction<{ testUid: string, output: string }>) => {
+    setTestOutput: (state: ReduxTestsState, action: PayloadAction<{ testUid: string, output: string }>): ReduxTestsState => {
       const newState = [...state];
       const foundIndex = newState.findIndex(test => test.testUid === action.payload.testUid);
       if (foundIndex === -1) {
         throw new Error(`[testsSlice.reducers.setTestOutput] Test not found: ${action.payload.testUid}`);
       }
-      newState[foundIndex].output = action.payload.output;
-      newState[foundIndex].isLoading = false;
-      return newState;
+      // newState[foundIndex].output = action.payload.output;
+      // newState[foundIndex].isLoading = false;
+      // return newState;
+      return [
+        ...newState.slice(0, foundIndex),
+        {
+          ...newState[foundIndex],
+          isLoading: false,
+          output: action.payload.output,
+          isSuccess: true,
+        },
+        ...newState.slice(foundIndex + 1),
+      ];
     },
   },
 });
@@ -89,7 +119,7 @@ export const selectTestFromCommand = (projectUid: string, command: string) => (s
 // --- thunks
 
 export const fetchTestsFromProjectThunk = (projectUid: string) => async (dispatch: Dispatch, getState: () => RootState) => {
-  dispatch(testsSlice.actions.setTestLoading({ testUid: projectUid }));
+  // dispatch(testsSlice.actions.setTestLoading({ testUid: projectUid }));
   const projectDir = selectProjectDir(projectUid)(getState());
   if (!projectDir) {
     throw new Error(`[fetchTestsFromProjectThunk] Project directory not found: ${projectUid}`);
@@ -122,7 +152,6 @@ export const fetchTestsFromProjectThunk = (projectUid: string) => async (dispatc
 };
 
 export const runTestThunk = (projectUid: string, command: string) => async (dispatch: Dispatch, getState: () => RootState) => {
-  dispatch(testsSlice.actions.setTestLoading({ testUid: projectUid }));
   const test: ReduxTest | undefined = selectTestFromCommand(projectUid, command)(getState());
   const projectDir = selectProjectDir(projectUid)(getState());
   if (!test) {
@@ -131,11 +160,12 @@ export const runTestThunk = (projectUid: string, command: string) => async (disp
   if (!projectDir) {
     throw new Error(`[runTestThunk] Project directory not found: ${projectUid}`);
   }
+  dispatch(testsSlice.actions.setTestLoading({ testUid: test.testUid }));
   try {
     const output = await rustRunShellCommand(projectDir, command);
-    await dispatch(testsSlice.actions.setTestOutput({ testUid: projectUid, output }));
+    await dispatch(testsSlice.actions.setTestOutput({ testUid: test.testUid, output }));
   } catch (error) {
-    await dispatch(testsSlice.actions.setTestError({ testUid: projectUid, output: _parseTestErrorOutput(error) }));
+    await dispatch(testsSlice.actions.setTestError({ testUid: test.testUid, output: _parseTestErrorOutput(error) }));
   }
 };
 

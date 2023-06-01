@@ -46,7 +46,7 @@ impl Project {
             &framework,
         ) {
             Ok(commands) => commands,
-            Err(err) => vec![],
+            Err(err) => vec![err],
         }
     }
 

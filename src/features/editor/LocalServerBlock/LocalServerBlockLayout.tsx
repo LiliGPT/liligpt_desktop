@@ -2,10 +2,10 @@ import ConfigIcon from '@mui/icons-material/Settings';
 import PlayIcon from '@mui/icons-material/PlayArrow';
 import DebugIcon from '@mui/icons-material/PlayCircle';
 import StopIcon from '@mui/icons-material/Stop';
-import { useAppDispatch } from '../../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { OpenedLocalServer } from './OpenedLocalServer';
 import { useState } from 'react';
-import { ReduxShellTask, addShellTaskThunk, removeShellTaskThunk } from '../../../redux/slices/shellTasksSlice';
+import { ReduxShellTask, addShellTaskThunk, removeShellTaskThunk, selectShellTasksByProject } from '../../../redux/slices/shellTasksSlice';
 
 interface Props {
   projectUid: string;
@@ -13,13 +13,11 @@ interface Props {
 }
 
 export function LocalServerBlockLayout({ projectUid, commands }: Props) {
-  const [currentCommand, setCurrentCommand] = useState<string>('');
-
   const dispatch = useAppDispatch();
+  const tasks = useAppSelector(selectShellTasksByProject(projectUid));
 
   const startLocalServer = (command: string) => {
     // dispatch(runLocalServerCommandThunk(name));
-    setCurrentCommand(command);
     const shellTask: ReduxShellTask = {
       projectUid,
       command,
@@ -31,7 +29,6 @@ export function LocalServerBlockLayout({ projectUid, commands }: Props) {
 
   const stopLocalServer = (command: string) => {
     dispatch(removeShellTaskThunk(`${projectUid}-${command}`));
-    setCurrentCommand('');
   };
 
   return (
@@ -44,7 +41,8 @@ export function LocalServerBlockLayout({ projectUid, commands }: Props) {
       <h2>Local Server</h2>
 
       {commands.map((command: string) => {
-        const commandIsRunning = currentCommand === command;
+        const task: ReduxShellTask | undefined = tasks.find((task: ReduxShellTask) => task.command === command);
+        const commandIsRunning = task?.isRunning ?? false;
         const statusMarker = commandIsRunning ? (
           <div className="w-2 h-2 rounded-full bg-green-600 inline-block mr-2"></div>
         ) : (
@@ -69,7 +67,7 @@ export function LocalServerBlockLayout({ projectUid, commands }: Props) {
         );
       })}
 
-      <OpenedLocalServer projectUid={projectUid} command={currentCommand} />
+      <OpenedLocalServer projectUid={projectUid} command={commands[0]} />
     </div>
   )
 }

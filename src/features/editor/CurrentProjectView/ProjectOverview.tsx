@@ -13,11 +13,6 @@ export function ProjectOverview() {
     dispatch(installDependenciesThunk(currentProject.projectUid));
   };
 
-  // todo: uncomment this
-  // const allowedLanguages = ['NodeTs', 'NodeJs'];
-  const allowedLanguages: string[] = [];
-  const testsEnabled: boolean = currentProject.dependencies.isInstalled && allowedLanguages.includes(currentProject.codeLanguage) || false;
-
   // header will be horizontal with title <h1/> and a clickable config icon in the right
   const header = (
     <div>
@@ -63,7 +58,7 @@ export function ProjectOverview() {
 
       <LocalServerBlock />
 
-      {testsEnabled && <TestingStatus />}
+      <TestingStatus />
 
       {/*
       <h2>Aplicações rodando</h2>

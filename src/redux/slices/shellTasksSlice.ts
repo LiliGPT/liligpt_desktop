@@ -42,22 +42,6 @@ export const shellTasksSlice = createSlice({
       newState.splice(foundIndex, 1);
       return newState;
     },
-    startShellTask: (state: ReduxShellTasksState, action: PayloadAction<string>): ReduxShellTasksState => {
-      const newState = [...state];
-      const foundIndex = newState.findIndex(shellTask => shellTask.shellTaskUid === action.payload);
-      if (foundIndex === -1) {
-        throw new Error(`[shellTasksSlice.reducers.startShellTask] Shell task not found: ${action.payload}`);
-      }
-      return newState;
-    },
-    stopShellTask: (state: ReduxShellTasksState, action: PayloadAction<string>): ReduxShellTasksState => {
-      const newState = [...state];
-      const foundIndex = newState.findIndex(shellTask => shellTask.shellTaskUid === action.payload);
-      if (foundIndex === -1) {
-        throw new Error(`[shellTasksSlice.reducers.stopShellTask] Shell task not found: ${action.payload}`);
-      }
-      return newState;
-    },
     setShellTaskPid: (state: ReduxShellTasksState, action: PayloadAction<{ shellTaskUid: string; pid: number }>): ReduxShellTasksState => {
       const newState = [...state];
       const foundIndex = newState.findIndex(shellTask => shellTask.shellTaskUid === action.payload.shellTaskUid);
@@ -66,12 +50,14 @@ export const shellTasksSlice = createSlice({
       }
       // newState[foundIndex].pid = action.payload.pid;
       // return newState;
+      const pid = action.payload.pid;
+      const isRunning = pid ? true : false;
       return [
         ...newState.slice(0, foundIndex),
         {
           ...newState[foundIndex],
-          pid: action.payload.pid,
-          isRunning: true,
+          pid,
+          isRunning,
         },
         ...newState.slice(foundIndex + 1),
       ];
@@ -94,6 +80,12 @@ export const selectShellTask = (shellTaskUid: string) => (state: { shellTasks: R
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const addShellTaskThunk = (shellTask: ReduxShellTask) => async (dispatch: Dispatch, getState: () => RootState): Promise<void> => {
+  const foundShellTask = selectShellTask(shellTask.shellTaskUid)(getState());
+  if (foundShellTask) {
+    await removeShellTaskThunk(foundShellTask.shellTaskUid)(dispatch, getState);
+  }
+  shellTask.isRunning = true;
+  shellTask.pid = 0;
   dispatch(shellTasksSlice.actions.addShellTask(shellTask));
   const logHandler = (name: string) => async (data: any) => {
     const log: ReduxShellLog = {
@@ -112,10 +104,18 @@ export const addShellTaskThunk = (shellTask: ReduxShellTask) => async (dispatch:
     onStdout: logHandler('stdout'),
     onStderr: logHandler('stderr'),
     onError: logHandler('error'),
-    onExit: logHandler('exit'),
+    onExit: async (a: any) => {
+      await dispatch(addShellLog({
+        shellTaskUid: shellTask.shellTaskUid,
+        message: `Exit error: ${a}`,
+        timestamp: Date.now(),
+        type: 'error',
+      }));
+      logHandler('exit');
+    },
   });
   // await child.kill();
-  alert(`pid is ${pid}`);
+  // alert(`pid is ${pid}`);
   await dispatch(shellTasksSlice.actions.setShellTaskPid({ shellTaskUid: shellTask.shellTaskUid, pid }));
   // await delay(5000);
   // console.log('----- 1', pid);
