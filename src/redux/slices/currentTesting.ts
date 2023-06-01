@@ -144,7 +144,6 @@ export const runTestCommand = (index: number) => async (dispatch: Dispatch, getS
     const projectDir = selectProjectDir(state);
     const output = await rustRunShellCommand(projectDir, `${scriptValue}`);
     dispatch(setTestResultByIndex({ index, isSuccess: true, output }));
-    console.log(`runTestCommand success`);
   } catch (e: any) {
     console.log(`runTestCommand error `, e);
     // dispatch(setError(e as Error));

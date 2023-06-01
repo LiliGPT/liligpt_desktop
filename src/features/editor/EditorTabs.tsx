@@ -1,36 +1,36 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { EditorTab, closeProjectByTabIdThunk, openProjectThunk, selectEditorTabs, setCurrentTabIdThunk } from '../../redux/slices/currentProject';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { SvgIcon } from '@mui/material';
+import { closeProjectThunk, openProjectThunk, selectProjects, setOpenedProjectUid } from '../../redux/slices/projectsSlice';
 
 const EditorTabs: React.FC = () => {
   const dispatch = useAppDispatch();
-  const tabs = useAppSelector(selectEditorTabs);
+  const projects = useAppSelector(selectProjects());
 
   const onClickOpenProject = () => {
     dispatch(openProjectThunk());
   };
 
-  const onClickTab = (tabId: string) => {
-    dispatch(setCurrentTabIdThunk(tabId));
+  const onClickTab = (projectUid: string) => {
+    dispatch(setOpenedProjectUid(projectUid));
   };
 
-  const onClickCloseButton = (tabId: string) => {
-    dispatch(closeProjectByTabIdThunk(tabId));
+  const onClickCloseButton = (projectUid: string) => {
+    dispatch(closeProjectThunk(projectUid));
   };
 
   return (
     <div className="flex flex-row">
       <div className="w-4/12"></div>
       <div className="flex flex-wrap gap-1 w-7/12">
-        {tabs.map((tab) => (
+        {projects.map((project) => (
           <div
-            key={tab.id}
+            key={project.projectUid}
             className="flex-none relative px-4 py-1 bg-gray-200 rounded-tl rounded-tr text-sm"
           >
-            <span className="mr-2" onClick={() => onClickTab(tab.id)}>{tab.displayName}</span>
-            <button className="absolute top-0 right-0 p-1" onClick={() => onClickCloseButton(tab.id)}>
+            <span className="mr-2" onClick={() => onClickTab(project.projectUid)}>{project.displayName}</span>
+            <button className="absolute top-0 right-0 p-1" onClick={() => onClickCloseButton(project.projectUid)}>
               <CloseIcon fontSize='small' />
             </button>
           </div>

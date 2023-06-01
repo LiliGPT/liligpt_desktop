@@ -1,19 +1,21 @@
 import { notification } from "@tauri-apps/api";
-import { installDependenciesThunk, selectCurrentProject } from "../../../redux/slices/currentProject"
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks"
 import { Button } from "@mui/material";
 import { TestingStatus } from "./TestingStatus";
 import { LocalServerBlock } from "../LocalServerBlock";
+import { installDependenciesThunk, selectCurrentProject } from "../../../redux/slices/projectsSlice";
 
 export function ProjectOverview() {
-  const currentProject = useAppSelector(selectCurrentProject)!;
+  const currentProject = useAppSelector(selectCurrentProject())!;
   const dispatch = useAppDispatch();
 
   const onClickInstallDependencies = async () => {
-    dispatch(installDependenciesThunk());
+    dispatch(installDependenciesThunk(currentProject.projectUid));
   };
 
-  const allowedLanguages = ['NodeTs', 'NodeJs'];
+  // todo: uncomment this
+  // const allowedLanguages = ['NodeTs', 'NodeJs'];
+  const allowedLanguages: string[] = [];
   const testsEnabled: boolean = currentProject.dependencies.isInstalled && allowedLanguages.includes(currentProject.codeLanguage) || false;
 
   // header will be horizontal with title <h1/> and a clickable config icon in the right

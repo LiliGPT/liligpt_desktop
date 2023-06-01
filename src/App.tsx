@@ -13,11 +13,10 @@ import { useAppSelector } from "./redux/hooks";
 import { EditorView } from "./features/editor/EditorView";
 
 function App() {
-  console.log('HELLO THERE!'); // TODO: this console.log is not working
   return (
     <div className="h-screen w-screen bg-app-bg text-app-text">
       <Provider store={store}>
-        <InnerApp />
+        <EditorView />
       </Provider>
     </div>
   );

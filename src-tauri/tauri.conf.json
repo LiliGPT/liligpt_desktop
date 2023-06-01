@@ -13,12 +13,24 @@
   "tauri": {
     "allowlist": {
       "all": false,
+      "process": {
+        "all": true,
+        "exit": true,
+        "relaunch": true,
+        "relaunchDangerousAllowSymlinkMacos": true
+      },
       "shell": {
         "all": true,
+        "execute": true,
         "scope": [
           {
             "name": "bash",
             "cmd": "/usr/bin/bash",
+            "args": true
+          },
+          {
+            "name": "sh",
+            "cmd": "/bin/sh",
             "args": true
           }
         ]
@@ -57,7 +69,7 @@
         "y": 10,
         "title": "guixx",
         "width": 1000,
-        "height": 600
+        "height": 730
       }
     ]
   }

@@ -1,10 +1,19 @@
 import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { LocalServer, LocalServerLogBlock, selectOpenedLocalServer } from "../../../redux/slices/localServers";
+import { selectShellTasksByProject } from "../../../redux/slices/shellTasksSlice";
+import { selectCurrentProject } from "../../../redux/slices/projectsSlice";
+import { ReduxShellLog, selectShellLogsByShellTaskId } from "../../../redux/slices/shellLogsSlice";
 
-export function OpenedLocalServer() {
+interface Props {
+  projectUid: string;
+  command: string;
+}
+
+export function OpenedLocalServer({ projectUid, command }: Props) {
   const dispatch = useAppDispatch();
-  const localServer: LocalServer | undefined = useAppSelector(selectOpenedLocalServer);
+  const shellTasks = useAppSelector(selectShellTasksByProject(projectUid));
+  const currentShellTask = shellTasks.find((shellTask) => shellTask.command === command);
+  const logs = useAppSelector(selectShellLogsByShellTaskId(currentShellTask?.shellTaskUid ?? ''));
   const refScrollview = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,16 +24,16 @@ export function OpenedLocalServer() {
     return () => {
       clearInterval(schedule);
     };
-  }, [localServer?.logs.length]);
+  }, [logs.length]);
 
-  if (!localServer) {
+  if (!logs.length) {
     return <></>;
   }
 
   return (
     <div className="p-2 bg-gray-400 h-96 overflow-y-auto" ref={refScrollview}>
-      {localServer.logs.map((log: LocalServerLogBlock) => {
-        return <div>{log.message}</div>;
+      {logs.map((log: ReduxShellLog, index: number) => {
+        return <div key={`${log.shellTaskUid}-${index}`}>{log.message}</div>;
       })}
     </div>
   );

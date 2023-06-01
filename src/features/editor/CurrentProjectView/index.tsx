@@ -17,7 +17,7 @@ export function CurrentProjectView({ onClickConfigButton }: Props) {
     <div className="flex items-stretch flex-col">
       <div className="flex flex-row">
         <div className="flex flex-col w-2/6">
-          <ProjectSidebar />
+          {/*<ProjectSidebar />*/}
         </div>
         <div className="flex flex-col w-4/6">
           <div className="flex flex-row relative">

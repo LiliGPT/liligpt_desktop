@@ -346,7 +346,7 @@ export const openProjectThunk = (project?: ProjectFromRust) => async (dispatch: 
     closeCurrentTesting()(dispatch, getState);
     loadRenderTreeThunk()(dispatch, getState);
     fetchCurrentTestingScriptsThunk()(dispatch, getState);
-    addLocalServerCommandsThunk(projectFromRust.local_server_commands)(dispatch, getState);
+    addLocalServerCommandsThunk(projectFromRust.project_dir, projectFromRust.local_server_commands)(dispatch, getState);
   } catch (e) {
     dispatch(setError(e as Error));
   }
@@ -358,7 +358,7 @@ export const setCurrentTabIdThunk = (tabId: string) => async (dispatch: Dispatch
   loadRenderTreeThunk()(dispatch, getState);
   fetchCurrentTestingScriptsThunk()(dispatch, getState);
   const currentProject = selectCurrentProject(getState())!;
-  addLocalServerCommandsThunk(currentProject.localServerCommands)(dispatch, getState);
+  addLocalServerCommandsThunk(currentProject.projectDir, currentProject.localServerCommands)(dispatch, getState);
 };
 
 export const loadRenderTreeThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {

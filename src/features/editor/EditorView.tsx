@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
-import { selectProjectDir } from "../../redux/slices/currentProject";
 import { WelcomeView } from "../welcome/WelcomeView";
 import { CurrentProjectView } from "./CurrentProjectView";
 import { ProjectSettingsView } from "./ProjectSettingsView";
 import EditorTabs from "./EditorTabs";
+import { selectCurrentProjectDir } from "../../redux/slices/projectsSlice";
 
 enum EditorScreen {
   Overview,
@@ -19,7 +19,7 @@ export function EditorView() {
   const openOverview = () => setScreen(EditorScreen.Overview);
 
   if (screen === EditorScreen.Overview) {
-    if (!useAppSelector(selectProjectDir)) {
+    if (!useAppSelector(selectCurrentProjectDir())) {
       return <WelcomeView />;
     }
     return <>

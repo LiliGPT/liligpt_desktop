@@ -2,23 +2,36 @@ import ConfigIcon from '@mui/icons-material/Settings';
 import PlayIcon from '@mui/icons-material/PlayArrow';
 import DebugIcon from '@mui/icons-material/PlayCircle';
 import StopIcon from '@mui/icons-material/Stop';
-import { LocalServer, runLocalServerThunk, stopLocalServerThunk } from '../../../redux/slices/localServers';
 import { useAppDispatch } from '../../../redux/hooks';
 import { OpenedLocalServer } from './OpenedLocalServer';
+import { useState } from 'react';
+import { ReduxShellTask, addShellTaskThunk, removeShellTaskThunk } from '../../../redux/slices/shellTasksSlice';
 
 interface Props {
-  servers: LocalServer[];
+  projectUid: string;
+  commands: string[];
 }
 
-export function LocalServerBlockLayout({ servers }: Props) {
+export function LocalServerBlockLayout({ projectUid, commands }: Props) {
+  const [currentCommand, setCurrentCommand] = useState<string>('');
+
   const dispatch = useAppDispatch();
 
-  const startLocalServer = (name: string) => {
-    dispatch(runLocalServerThunk(name));
+  const startLocalServer = (command: string) => {
+    // dispatch(runLocalServerCommandThunk(name));
+    setCurrentCommand(command);
+    const shellTask: ReduxShellTask = {
+      projectUid,
+      command,
+      shellTaskUid: `${projectUid}-${command}`,
+      isRunning: false,
+    };
+    dispatch(addShellTaskThunk(shellTask));
   };
 
-  const stopLocalServer = (name: string) => {
-    dispatch(stopLocalServerThunk(name));
+  const stopLocalServer = (command: string) => {
+    dispatch(removeShellTaskThunk(`${projectUid}-${command}`));
+    setCurrentCommand('');
   };
 
   return (
@@ -30,32 +43,33 @@ export function LocalServerBlockLayout({ servers }: Props) {
       </div>
       <h2>Local Server</h2>
 
-      {servers.map((server) => {
-        const statusMarker = server.isRunning ? (
+      {commands.map((command: string) => {
+        const commandIsRunning = currentCommand === command;
+        const statusMarker = commandIsRunning ? (
           <div className="w-2 h-2 rounded-full bg-green-600 inline-block mr-2"></div>
         ) : (
           <div className="w-2 h-2 rounded-full bg-gray-500 inline-block mr-2"></div>
         );
-        const playButton = !server.isRunning && (
-          <span onClick={() => startLocalServer(server.name)}>
+        const playButton = !commandIsRunning && (
+          <span onClick={() => startLocalServer(command)}>
             <PlayIcon />
           </span>
         );
-        const stopButton = server.isRunning && (
-          <span onClick={() => stopLocalServer(server.name)}>
+        const stopButton = commandIsRunning && (
+          <span onClick={() => stopLocalServer(command)}>
             <StopIcon />
           </span>
         );
         return (
-          <div className="py-2" key={server.name}>
+          <div className="py-2" key={command}>
             {statusMarker}
-            <span className="font-semibold">{server.name}</span>
+            <span className="font-semibold">{command}</span>
             {playButton} {stopButton}
           </div>
         );
       })}
 
-      <OpenedLocalServer />
+      <OpenedLocalServer projectUid={projectUid} command={currentCommand} />
     </div>
   )
 }
