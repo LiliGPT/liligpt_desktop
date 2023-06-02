@@ -12,7 +12,9 @@ interface ReduxProjectDependency {
 
 export type ReduxSubproject = SubprojectFromRust;
 
+
 export interface ReduxProject {
+  parentProjectUid?: string;
   projectUid: string;
   projectDir: string;
   displayName: string;
@@ -133,6 +135,18 @@ export const selectCurrentProject = () => (state: RootState): ReduxProject | und
   return currentProject;
 };
 
+export const selectCurrentProjectParent = () => (state: RootState): ReduxProject | undefined => {
+  const currentProject = selectCurrentProject()(state);
+  if (!currentProject) {
+    return undefined;
+  }
+  if (!currentProject.parentProjectUid) {
+    return undefined;
+  }
+  const parentProject = state.projects.projects.find(project => project.projectUid === currentProject.parentProjectUid);
+  return parentProject;
+};
+
 export const selectCurrentProjectDir = () => (state: RootState): string => selectCurrentProject()(state)?.projectDir ?? '';
 
 export const selectProjectDir = (projectUid: string) => (state: RootState): string => {
@@ -147,39 +161,61 @@ export const selectProjects = () => (state: RootState): ReduxProject[] => {
   return state.projects.projects;
 };
 
+export const selectRootProjects = () => (state: RootState): ReduxProject[] => {
+  return state.projects.projects.filter(project => !project.parentProjectUid);
+};
+
 // --- thunks
 
-export const openProjectThunk = (project?: ProjectFromRust) => async (dispatch: Dispatch, getState: () => RootState) => {
-  addNotificationThunk(ReduxNotificationType.info, 'Opening project...')(dispatch, getState);
-  project = project ?? await rustOpenProject();
-  const projectUid = project.project_dir;
-  const projectDir = project.project_dir;
-  const displayName = project.project_dir.split('/').pop() ?? project.project_dir;
-  const codeLanguage = project.code_language;
-  const framework = project.framework;
+const _openProjectFromRustThunk = (projectFromRust: ProjectFromRust, parentProjectUid?: string) => async (dispatch: Dispatch, getState: () => RootState) => {
+  const projectUid = projectFromRust.project_dir;
+  const projectDir = projectFromRust.project_dir;
+  const displayName = projectFromRust.project_dir.split('/').pop() ?? projectFromRust.project_dir;
+  const codeLanguage = projectFromRust.code_language;
+  const framework = projectFromRust.framework;
   const dependencies: ReduxProjectDependency = {
-    isInstalled: project.dependencies_installed,
+    isInstalled: projectFromRust.dependencies_installed,
     errorMessage: '',
     isLoading: false,
   };
-  const localServerCommands = project.local_server_commands;
-  await dispatch(projectsSlice.actions.addProject({
-    projectUid,
-    projectDir,
-    displayName,
-    codeLanguage,
-    framework,
-    dependencies,
-    localServerCommands,
-    subprojects: project.subprojects,
-  }));
+  const localServerCommands = projectFromRust.local_server_commands;
+  const projectExists = getState().projects.projects.find(project => project.projectUid === projectUid);
+  if (projectExists) {
+  } else {
+    await dispatch(projectsSlice.actions.addProject({
+      parentProjectUid,
+      projectUid,
+      projectDir,
+      displayName,
+      codeLanguage,
+      framework,
+      dependencies,
+      localServerCommands,
+      subprojects: projectFromRust.subprojects,
+    }));
+    await fetchTestsFromProjectThunk(projectUid)(dispatch, getState);
+  }
   await dispatch(projectsSlice.actions.setOpenedProjectUid(projectUid));
-  await fetchTestsFromProjectThunk(projectUid)(dispatch, getState);
+};
+
+export const openProjectThunk = (projectFromRust?: ProjectFromRust) => async (dispatch: Dispatch, getState: () => RootState) => {
+  addNotificationThunk(ReduxNotificationType.info, 'Opening project...')(dispatch, getState);
+  projectFromRust = projectFromRust ?? await rustOpenProject();
+  await _openProjectFromRustThunk(projectFromRust)(dispatch, getState);
+};
+
+export const openSubprojectThunk = (projectUid: string, subprojectPath: string) => async (dispatch: Dispatch, getState: () => RootState) => {
+  const projectFromRust = await rustOpenProject(subprojectPath);
+  await _openProjectFromRustThunk(projectFromRust, projectUid)(dispatch, getState);
 };
 
 export const closeProjectThunk = (projectUid: string) => async (dispatch: Dispatch, getState: () => RootState) => {
   // todo: remove other resources (logs, shellTasks, renderTrees)
   await dispatch(projectsSlice.actions.removeProject(projectUid));
+  const subprojects = selectProjects()(getState()).filter(project => project.parentProjectUid === projectUid);
+  for (const subproject of subprojects) {
+    await dispatch(projectsSlice.actions.removeProject(subproject.projectUid));
+  }
 };
 
 export const closeCurrentProjectThunk = () => async (dispatch: Dispatch, getState: () => RootState) => {

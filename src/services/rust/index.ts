@@ -16,10 +16,10 @@ export interface ProjectFromRust {
   subprojects: SubprojectFromRust[];
 }
 
-export function rustOpenProject(): Promise<ProjectFromRust> {
+export function rustOpenProject(path?: string): Promise<ProjectFromRust> {
   // return invoke("open_project", {});
   return new Promise((resolve, reject) => {
-    const request = {};
+    const request = { path: path ?? '' };
     invoke("open_project", request).then(response => {
       console.log(`[rustOpenProject]`, { request, response })
       resolve(response as ProjectFromRust);

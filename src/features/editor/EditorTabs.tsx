@@ -2,11 +2,11 @@ import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { SvgIcon } from '@mui/material';
-import { closeProjectThunk, openProjectThunk, selectProjects, setOpenedProjectUid } from '../../redux/slices/projectsSlice';
+import { closeProjectThunk, openProjectThunk, selectProjects, selectRootProjects, setOpenedProjectUid } from '../../redux/slices/projectsSlice';
 
 const EditorTabs: React.FC = () => {
   const dispatch = useAppDispatch();
-  const projects = useAppSelector(selectProjects());
+  const projects = useAppSelector(selectRootProjects());
 
   const onClickOpenProject = () => {
     dispatch(openProjectThunk());

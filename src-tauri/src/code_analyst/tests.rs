@@ -1,6 +1,12 @@
-pub fn get_test_scripts(project_dir: String) -> Result<impl serde::Serialize, String> {
-    let package_json = std::fs::read_to_string(&format!("{}/package.json", project_dir))
-        .expect("error reading package.json");
+pub fn get_test_scripts(
+    project_dir: String,
+) -> Result<serde_json::Map<String, serde_json::Value>, String> {
+    let package_json_path = format!("{}/package.json", project_dir);
+    if !std::path::Path::new(&package_json_path).exists() {
+        return Err("package.json not found".to_string());
+    }
+    let package_json =
+        std::fs::read_to_string(&package_json_path).expect("error reading package.json");
     let package_json: serde_json::Value =
         serde_json::from_str(&package_json).expect("error parsing package.json");
     let test_scripts = package_json["scripts"].to_owned();

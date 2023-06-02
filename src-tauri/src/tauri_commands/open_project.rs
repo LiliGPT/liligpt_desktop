@@ -1,11 +1,18 @@
 #[tauri::command]
-pub async fn open_project() -> Result<impl serde::Serialize, String> {
+pub async fn open_project(path: String) -> Result<impl serde::Serialize, String> {
     // get project_dir as string
-    let project_dir = tauri::api::dialog::blocking::FileDialogBuilder::new().pick_folder();
-    if project_dir.is_none() {
-        return Err("no project selected".to_string());
-    }
-    let project_dir = project_dir.unwrap().to_str().unwrap().to_owned();
+    let project_dir: String = match path {
+        // if path is empty, open file dialog
+        path if path.is_empty() => {
+            let picked_folder =
+                tauri::api::dialog::blocking::FileDialogBuilder::new().pick_folder();
+            if picked_folder.is_none() {
+                return Err("no project selected".to_string());
+            }
+            picked_folder.unwrap().to_str().unwrap().to_owned()
+        }
+        _ => path,
+    };
     // return project_dir as json
     // let project = crate::project::Project::new_from_directory(&project_dir).await;
     // Ok(project.to_json()?)

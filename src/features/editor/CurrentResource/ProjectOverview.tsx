@@ -13,6 +13,9 @@ export function ProjectOverview() {
     dispatch(installDependenciesThunk(currentProject.projectUid));
   };
 
+  const isValidLanguage = currentProject.codeLanguage !== 'Unknown';
+  const isValidFramework = !!(isValidLanguage && currentProject.framework !== 'Unknown');
+
   // header will be horizontal with title <h1/> and a clickable config icon in the right
   const header = (
     <div>
@@ -36,7 +39,7 @@ export function ProjectOverview() {
     dependencyAction = (
       <span className="text-orange-400 italic text-xs">instalando...</span>
     );
-  } else if (!currentProject.dependencies.isInstalled) {
+  } else if (isValidFramework && !currentProject.dependencies.isInstalled) {
     dependencyAction = (
       <Button variant="text" color="primary" onClick={onClickInstallDependencies}>Instalar</Button>
     );
@@ -56,9 +59,9 @@ export function ProjectOverview() {
         </li>
       </ul>
 
-      <LocalServerBlock />
+      {isValidLanguage && <LocalServerBlock />}
 
-      <TestingStatus />
+      {isValidFramework && <TestingStatus />}
 
       {/*
       <h2>Aplicações rodando</h2>
