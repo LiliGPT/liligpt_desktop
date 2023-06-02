@@ -5,8 +5,8 @@
 mod code_analyst;
 mod database;
 mod io;
-mod project;
 mod tauri_commands;
+mod utils;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 

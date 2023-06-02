@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
 import { WelcomeView } from "../welcome/WelcomeView";
-import { CurrentProjectView } from "./CurrentProjectView";
-import { ProjectSettingsView } from "./ProjectSettingsView";
+import { CurrentResource } from "./CurrentResource";
+import { ResourceSettings } from "./ResourceSettings";
 import EditorTabs from "./EditorTabs";
 import { selectCurrentProjectDir } from "../../redux/slices/projectsSlice";
 
@@ -24,12 +24,12 @@ export function EditorView() {
     }
     return <>
       <EditorTabs />
-      <CurrentProjectView onClickConfigButton={openSettings} />
+      <CurrentResource onClickConfigButton={openSettings} />
     </>;
   }
 
   if (screen === EditorScreen.Settings) {
-    return <ProjectSettingsView
+    return <ResourceSettings
       onClickCloseButton={openOverview}
     />;
   }

@@ -4,7 +4,7 @@ type Props = {
   onClickCloseButton: () => void;
 }
 
-export function ProjectSettingsView({ onClickCloseButton }: Props) {
+export function ResourceSettings({ onClickCloseButton }: Props) {
   return (
     <div className="flex items-stretch flex-col">
       <div className="flex flex-row">

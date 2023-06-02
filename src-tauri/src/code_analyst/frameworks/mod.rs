@@ -52,13 +52,10 @@ pub fn get_local_server_commands(
     framework: &super::types::Framework,
 ) -> Result<Vec<String>, String> {
     // read projectJson at project_dir
-    match framework {
-        super::types::Framework::NodeNest => Ok(vec!["npm run start:dev".to_string()]),
-        super::types::Framework::NodeExpress => match node_commands(project_dir) {
-            Ok(commands) => Ok(commands),
-            Err(_) => Ok(vec!["npm start".to_string()]),
-        },
-        _ => Ok(vec!["iii".to_string()]),
+    match code_language {
+        super::types::CodeLanguage::NodeJs => Ok(node_commands(project_dir).unwrap_or(vec![])),
+        super::types::CodeLanguage::NodeTs => Ok(node_commands(project_dir).unwrap_or(vec![])),
+        super::types::CodeLanguage::Unknown => Ok(vec![]),
     }
 }
 
