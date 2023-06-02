@@ -1,8 +1,11 @@
 pub mod dependencies;
 pub mod frameworks;
 pub mod languages;
+pub mod subprojects;
 pub mod tests;
 pub mod types;
+
+pub use tests::get_test_scripts;
 
 pub fn get_path_info(path: &str) -> Result<impl serde::Serialize, String> {
     let code_language =
@@ -12,6 +15,7 @@ pub fn get_path_info(path: &str) -> Result<impl serde::Serialize, String> {
         frameworks::is_dependencies_installed(path, &code_language).unwrap_or(false);
     let local_server_commands =
         frameworks::get_local_server_commands(path, &code_language, &framework).unwrap_or(vec![]);
+    let subprojects = subprojects::get_subprojects(path, &code_language, &framework);
 
     return Ok(serde_json::json!({
       "project_dir": path,
@@ -19,5 +23,14 @@ pub fn get_path_info(path: &str) -> Result<impl serde::Serialize, String> {
       "framework": framework.to_string(),
       "dependencies_installed": dependencies_installed,
       "local_server_commands": local_server_commands,
+      "subprojects": subprojects,
     }));
+}
+
+pub fn install_dependencies(cwd: String) -> Result<impl serde::Serialize, String> {
+    let test_scripts = dependencies::nodets::install_dependencies(&cwd);
+    match test_scripts {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e.to_string()),
+    }
 }

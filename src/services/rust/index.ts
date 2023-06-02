@@ -1,11 +1,19 @@
 import { invoke } from "@tauri-apps/api/tauri";
 
+export interface SubprojectFromRust {
+  name: string;
+  path: string;
+  code_language: string;
+  framework: string;
+}
+
 export interface ProjectFromRust {
   project_dir: string;
   code_language: string;
   framework: string;
   dependencies_installed: boolean;
   local_server_commands: string[];
+  subprojects: SubprojectFromRust[];
 }
 
 export function rustOpenProject(): Promise<ProjectFromRust> {

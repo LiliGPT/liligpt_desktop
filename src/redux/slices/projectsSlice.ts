@@ -1,6 +1,6 @@
 import { Dispatch, PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { ProjectFromRust, rustInstallDependencies, rustOpenProject } from "../../services/rust";
+import { ProjectFromRust, SubprojectFromRust, rustInstallDependencies, rustOpenProject } from "../../services/rust";
 import { ReduxNotificationType, addNotificationThunk } from "./notificationsSlice";
 import { fetchTestsFromProjectThunk } from "./testsSlice";
 
@@ -10,7 +10,9 @@ interface ReduxProjectDependency {
   errorMessage: string;
 }
 
-interface ReduxProject {
+export type ReduxSubproject = SubprojectFromRust;
+
+export interface ReduxProject {
   projectUid: string;
   projectDir: string;
   displayName: string;
@@ -18,6 +20,7 @@ interface ReduxProject {
   framework: string;
   dependencies: ReduxProjectDependency;
   localServerCommands: string[];
+  subprojects: ReduxSubproject[];
 }
 
 interface ReduxProjectsState {
@@ -168,6 +171,7 @@ export const openProjectThunk = (project?: ProjectFromRust) => async (dispatch: 
     framework,
     dependencies,
     localServerCommands,
+    subprojects: project.subprojects,
   }));
   await dispatch(projectsSlice.actions.setOpenedProjectUid(projectUid));
   await fetchTestsFromProjectThunk(projectUid)(dispatch, getState);
