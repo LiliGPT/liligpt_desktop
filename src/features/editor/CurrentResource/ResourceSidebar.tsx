@@ -19,9 +19,14 @@ export function ResourceSidebar() {
     return <></>;
   }
 
+  if (project) {
+    return <>
+      {/*<FileSystemTree />*/}
+    </>;
+  }
+
   return (
     <div className="p-2 h-screen">
-      {/*<FileSystemTree />*/}
       <RootProjectItem
         onClick={() => dispatch(setOpenedProjectUid(rootProject!.projectUid))}
         active={openedProjectUid === rootProject!.projectUid}

@@ -33,7 +33,10 @@ export function OpenedLocalServer({ projectUid, command }: Props) {
   return (
     <div className="p-2 bg-gray-400 h-96 overflow-y-auto" ref={refScrollview}>
       {logs.map((log: ReduxShellLog, index: number) => {
-        return <div key={`${log.shellTaskUid}-${index}`}>{log.message}</div>;
+        return <div
+          key={`${log.shellTaskUid}-${index}`}
+          dangerouslySetInnerHTML={{ __html: log.message }}
+        ></div>;
       })}
     </div>
   );

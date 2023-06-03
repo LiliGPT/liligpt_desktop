@@ -64,7 +64,22 @@ export const projectsSlice = createSlice({
       if (foundIndex === -1) {
         throw new Error(`[projectsSlice.reducers.removeProject] Project not found: ${action.payload}`);
       }
-      const newState = { ...state };
+      let newState: ReduxProjectsState = { ...state };
+      if (newState.openedProjectUid === action.payload) {
+        if (foundIndex === 0) {
+          const newProjectUid = newState.projects[1]?.projectUid ?? '';
+          newState = {
+            ...newState,
+            openedProjectUid: newProjectUid,
+          };
+        } else {
+          const newProjectUid = newState.projects[foundIndex - 1].projectUid;
+          newState = {
+            ...newState,
+            openedProjectUid: newProjectUid,
+          };
+        }
+      }
       // newState.projects.splice(foundIndex, 1);
       // return newState;
       return {
