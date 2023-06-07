@@ -3,7 +3,7 @@ import { useAppDispatch } from "../../redux/hooks";
 import { openProjectThunk } from "../../redux/slices/projectsSlice";
 import { ProjectFromRust } from "../../services/rust";
 
-const ENABLE_INITIAL_DISPATCHER = true;
+const ENABLE_INITIAL_DISPATCHER = false;
 
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 

@@ -21,10 +21,10 @@ export function rustOpenProject(path?: string): Promise<ProjectFromRust> {
   return new Promise((resolve, reject) => {
     const request = { path: path ?? '' };
     invoke("open_project", request).then(response => {
-      console.log(`[rustOpenProject]`, { request, response })
+      console.log(`[rustOpenProject]`, { request, response });
       resolve(response as ProjectFromRust);
     }).catch(error => {
-      console.log(`[rustOpenProject]`, { request, error })
+      console.log(`[rustOpenProject]`, { request, error });
       reject(error);
     });
   });
@@ -43,10 +43,10 @@ export function rustGetFileTree(projectDir: string): Promise<RenderTree> {
   return new Promise((resolve, reject) => {
     const request = { projectDir };
     invoke("get_file_tree", request).then(response => {
-      console.log(`[rustGetFileTree]`, { request, response })
+      console.log(`[rustGetFileTree]`, { request, response });
       resolve(response as RenderTree);
     }).catch(error => {
-      console.log(`[rustGetFileTree]`, { request, error })
+      console.log(`[rustGetFileTree]`, { request, error });
       reject(error);
     });
   });
@@ -61,10 +61,10 @@ export function rustGetTestScripts(projectDir: string): Promise<TestScriptFromRu
   return new Promise((resolve, reject) => {
     const request = { projectDir };
     invoke("get_test_scripts", request).then(response => {
-      console.log(`[rustGetTestScripts]`, { request, response })
+      console.log(`[rustGetTestScripts]`, { request, response });
       resolve(response as TestScriptFromRust);
     }).catch(error => {
-      console.log(`[rustGetTestScripts]`, { request, error })
+      console.log(`[rustGetTestScripts]`, { request, error });
       reject(error);
     });
   });
@@ -75,10 +75,10 @@ export function rustRunShellCommand(cwd: string, command: string): Promise<strin
   return new Promise((resolve, reject) => {
     const request = { cwd, command };
     invoke("run_shell_command", request).then(response => {
-      console.log(`[rustRunShellCommand]`, { request, response })
+      console.log(`[rustRunShellCommand]`, { request, response });
       resolve(response as string);
     }).catch(error => {
-      console.log(`[rustRunShellCommand]`, { request, error })
+      console.log(`[rustRunShellCommand]`, { request, error });
       reject(error);
     });
   });
@@ -88,11 +88,92 @@ export function rustInstallDependencies(cwd: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = { cwd };
     invoke("install_dependencies", request).then(response => {
-      console.log(`[rustInstallDependencies]`, { request, response })
+      console.log(`[rustInstallDependencies]`, { request, response });
       resolve();
     }).catch(error => {
-      console.log(`[rustInstallDependencies]`, { request, error })
+      console.log(`[rustInstallDependencies]`, { request, error });
       reject(error);
     });
   });
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Prompter
+
+export interface PreparedPromptFromRust {
+  message: string;
+  code_language: string;
+  framework: string;
+  files: {
+    can_create: boolean;
+    can_read: boolean;
+    context: PromptContextFile[];
+  };
+}
+export interface PromptResponseFromRust {
+  prompt_id: string;
+  status: string; // Ok
+  actions: PromptAction[],
+}
+
+interface PromptContextFile {
+  path: string;
+  content: string | null;
+}
+interface PromptAction {
+  action_type: string; // create_file | update_file
+  content: string | null;
+  path: string;
+}
+
+export async function rustPromptPrepare(projectDir: string, message: string): Promise<PreparedPromptFromRust> {
+  return new Promise((resolve, reject) => {
+    const request = { path: projectDir, message };
+    invoke("rust_prompt_prepare", request).then(response => {
+      console.log(`[rustPromptPrepare]`, { request, response });
+      resolve(response as PreparedPromptFromRust);
+    }).catch(error => {
+      console.log(`[rustPromptPrepare]`, { request, error });
+      reject(error);
+    });
+  });
+};
+
+export async function rustPromptCreate(projectDir: string, prompt: PreparedPromptFromRust): Promise<PromptResponseFromRust> {
+  return new Promise((resolve, reject) => {
+    const request = { path: projectDir, prompt };
+    invoke("rust_prompt_create", request).then(response => {
+      console.log(`[rustPromptCreate]`, { request, response });
+      resolve(response as PromptResponseFromRust);
+    }).catch(error => {
+      console.log(`[rustPromptCreate]`, { request, error });
+      reject(error);
+    });
+  });
+};
+
+export async function rustPromptApproveAndRun(projectDir: string, promptId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { path: projectDir, promptId };
+    invoke("rust_prompt_approve_and_run", request).then(response => {
+      console.log(`[rustPromptApproveAndRun]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustPromptApproveAndRun]`, { request, error });
+      reject(error);
+    });
+  });
+};
+
+export async function rustPromptDelete(promptId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { promptId };
+    invoke("rust_prompt_delete", request).then(response => {
+      console.log(`[rustPromptDelete]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustPromptDelete]`, { request, error });
+      reject(error);
+    });
+  });
+};

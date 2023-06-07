@@ -4,14 +4,20 @@ import { Button } from "@mui/material";
 import { TestingStatus } from "./TestingStatus";
 import { LocalServerBlock } from "../LocalServerBlock";
 import { installDependenciesThunk, selectCurrentProject } from "../../../redux/slices/projectsSlice";
-import { AskMissionInput } from "./AskMissionInput";
+import { useState } from "react";
+import { MissionDialog } from "../MissionDialog/MissionDialog";
 
 export function ProjectOverview() {
   const currentProject = useAppSelector(selectCurrentProject())!;
   const dispatch = useAppDispatch();
+  const [openMissionDialog, setOpenMissionDialog] = useState(false);
 
   const onClickInstallDependencies = async () => {
-    dispatch(installDependenciesThunk(currentProject.projectUid));
+    await dispatch(installDependenciesThunk(currentProject.projectUid));
+  };
+
+  const onClickOpenMissionButton = async () => {
+    setOpenMissionDialog(true);
   };
 
   const isValidLanguage = currentProject.codeLanguage !== 'Unknown';
@@ -64,7 +70,14 @@ export function ProjectOverview() {
 
       {isValidFramework && <TestingStatus />}
 
-      {isValidLanguage && isValidFramework && <AskMissionInput />}
+      {isValidLanguage && isValidFramework && <button
+        className="px-2 py-1 text-sm bg-slate-300 hover:bg-indigo-200 rounded"
+        onClick={onClickOpenMissionButton}
+      >
+        New mission
+      </button>}
+
+      <MissionDialog open={openMissionDialog} onClose={() => setOpenMissionDialog(false)} />
 
       {/*
       <h2>Aplicações rodando</h2>
