@@ -64,32 +64,36 @@ export const projectsSlice = createSlice({
       if (foundIndex === -1) {
         throw new Error(`[projectsSlice.reducers.removeProject] Project not found: ${action.payload}`);
       }
-      let newState: ReduxProjectsState = { ...state };
-      if (newState.openedProjectUid === action.payload) {
-        if (foundIndex === 0) {
-          const newProjectUid = newState.projects[1]?.projectUid ?? '';
-          newState = {
-            ...newState,
-            openedProjectUid: newProjectUid,
-          };
-        } else {
-          const newProjectUid = newState.projects[foundIndex - 1].projectUid;
-          newState = {
-            ...newState,
-            openedProjectUid: newProjectUid,
-          };
-        }
-      }
-      // newState.projects.splice(foundIndex, 1);
-      // return newState;
-      return {
-        ...newState,
+      let newState: ReduxProjectsState = {
+        ...state,
         projects: [
           // remove 1 item
-          ...newState.projects.slice(0, foundIndex),
-          ...newState.projects.slice(foundIndex + 1),
+          ...state.projects.slice(0, foundIndex),
+          ...state.projects.slice(foundIndex + 1),
         ],
       };
+      newState = {
+        ...newState,
+        openedProjectUid: newState.projects[foundIndex]?.projectUid ?? newState.projects[0]?.projectUid ?? '',
+      };
+      console.log('newState', foundIndex, newState);
+      // if (newState.openedProjectUid === action.payload) {
+      //   if (foundIndex === 0) {
+      //     const newProjectUid = newState.projects[1]?.projectUid ?? '';
+      //     newState = {
+      //       ...newState,
+      //       openedProjectUid: newProjectUid,
+      //     };
+      //   } else {
+      //     const newProjectUid = newState.projects[foundIndex - 1].projectUid;
+      //     newState = {
+      //       ...newState,
+      //       openedProjectUid: newProjectUid,
+      //     };
+      //   }
+      // }
+      // newState.projects.splice(foundIndex, 1);
+      return newState;
     },
     setDependenciesLoading: (state: ReduxProjectsState, action: PayloadAction<{ projectUid: string }>): ReduxProjectsState => {
       const foundIndex = state.projects.findIndex(project => project.projectUid === action.payload.projectUid);
@@ -147,6 +151,14 @@ export const projectsSlice = createSlice({
 
 export const selectCurrentProject = () => (state: RootState): ReduxProject | undefined => {
   const currentProject = state.projects.projects.find(project => project.projectUid === state.projects.openedProjectUid);
+  if (!currentProject && state.projects.projects.length > 0) {
+    console.log(
+      '[projectsSlice.selectors.selectCurrentProject] No current project. This should be fixed!',
+      state.projects.openedProjectUid,
+      state.projects.projects,
+    );
+    return state.projects.projects[0];
+  }
   return currentProject;
 };
 

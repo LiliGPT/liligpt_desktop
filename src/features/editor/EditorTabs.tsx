@@ -22,19 +22,19 @@ const EditorTabs: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-row">
-      <div className="w-4/12"></div>
-      <div className="flex flex-wrap gap-1 w-7/12">
+    <div className="flex flex-row pt-2 bg-slate-500 border-b-slate-300 border-b-2">
+      <div className="flex flex-wrap w-11/12">
         {projects.map((project) => {
           const isActive = project.projectUid === currentProjectUid;
-          let className = 'flex-none relative px-4 py-1 rounded-tl rounded-tr text-sm cursor-pointer';
-          className += `${isActive ? ' bg-slate-300' : ' bg-gray-200 hover:bg-gray-300'}`;
+          let className = 'flex-none relative ml-1 px-4 py-1 rounded-tl rounded-tr text-sm cursor-pointer';
+          className += `${isActive ? ' bg-slate-200' : ' bg-slate-400 hover:bg-slate-200'}`;
           return (
             <div
               key={project.projectUid}
               className={className}
+              onClick={() => onClickTab(project.projectUid)}
             >
-              <span className="mr-2" onClick={() => onClickTab(project.projectUid)}>{project.displayName}</span>
+              <span className="mr-2">{project.displayName}</span>
               <button className="absolute top-0 right-0 p-1" onClick={() => onClickCloseButton(project.projectUid)}>
                 <CloseIcon fontSize='small' />
               </button>

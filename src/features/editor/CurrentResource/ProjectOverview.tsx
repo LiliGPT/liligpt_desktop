@@ -4,6 +4,7 @@ import { Button } from "@mui/material";
 import { TestingStatus } from "./TestingStatus";
 import { LocalServerBlock } from "../LocalServerBlock";
 import { installDependenciesThunk, selectCurrentProject } from "../../../redux/slices/projectsSlice";
+import { AskMissionInput } from "./AskMissionInput";
 
 export function ProjectOverview() {
   const currentProject = useAppSelector(selectCurrentProject())!;
@@ -62,6 +63,8 @@ export function ProjectOverview() {
       {isValidLanguage && <LocalServerBlock />}
 
       {isValidFramework && <TestingStatus />}
+
+      {isValidLanguage && isValidFramework && <AskMissionInput />}
 
       {/*
       <h2>Aplicações rodando</h2>

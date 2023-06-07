@@ -1,51 +1,47 @@
-import { Button } from "@mui/material";
-import { invoke } from "@tauri-apps/api/tauri";
-import { useAppDispatch } from "../../redux/hooks";
-import { message } from '@tauri-apps/api/dialog';
-import { ProjectFromRust } from "../../services/rust";
-import { shell } from "@tauri-apps/api";
 import { useEffect } from "react";
-import { LocalServerLogBlock, addLogToLocalServer, openLocalServerThunk, runLocalServerCommandThunk, stopLocalServerThunk } from "../../redux/slices/localServers";
+import { useAppDispatch } from "../../redux/hooks";
 import { openProjectThunk } from "../../redux/slices/projectsSlice";
+import { ProjectFromRust } from "../../services/rust";
 
-const ENABLE_INITIAL_DISPATCHER = false;
+const ENABLE_INITIAL_DISPATCHER = true;
 
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // this function was created to start the app in a desired state
 function _InitialDispatcher() {
-  // const dispatch = useAppDispatch();
-  // useEffect(() => {
-  //   async function run() {
-  //     const project: ProjectFromRust = {
-  //       code_language: 'NodeTs',
-  //       framework: 'NodeNest',
-  //       dependencies_installed: true,
-  //       local_server_commands: ['npm run start:dev'],
-  //       project_dir: '/home/l/sample-projects/nestjs-example-project',
-  //     };
-  //     // open the project
-  //     await dispatch(openProjectThunk(project));
-  //     // start running the command line
-  //     await dispatch(runLocalServerCommandThunk('npm run start:dev'));
-  //     // open the screen/dialog to see details about the local server
-  //     await dispatch(openLocalServerThunk('npm run start:dev'));
-  //     // add a log to the local server
-  //     const log: LocalServerLogBlock = {
-  //       message: 'Starting server...',
-  //       timestamp: new Date().toISOString(),
-  //       id: 9999999,
-  //       type: 'internal',
-  //     }
-  //     await dispatch(addLogToLocalServer({
-  //       log,
-  //       serverName: 'npm run start:dev',
-  //     }));
-  //     await delay(13000);
-  //     await dispatch(stopLocalServerThunk('npm run start:dev'));
-  //   }
-  //   run();
-  // }, []);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    async function run() {
+      const project: ProjectFromRust = {
+        code_language: 'NodeTs',
+        framework: 'NodeNest',
+        dependencies_installed: true,
+        local_server_commands: ['npm run start:dev'],
+        project_dir: '/home/l/sample-projects/nestjs-example-project',
+        subprojects: [],
+      };
+      // open the project
+      await dispatch(openProjectThunk(project));
+      //   // start running the command line
+      //   await dispatch(runLocalServerCommandThunk('npm run start:dev'));
+      //   // open the screen/dialog to see details about the local server
+      //   await dispatch(openLocalServerThunk('npm run start:dev'));
+      //   // add a log to the local server
+      //   const log: LocalServerLogBlock = {
+      //     message: 'Starting server...',
+      //     timestamp: new Date().toISOString(),
+      //     id: 9999999,
+      //     type: 'internal',
+      //   }
+      //   await dispatch(addLogToLocalServer({
+      //     log,
+      //     serverName: 'npm run start:dev',
+      //   }));
+      //   await delay(13000);
+      //   await dispatch(stopLocalServerThunk('npm run start:dev'));
+    }
+    run();
+  }, []);
   return <></>;
 }
 
