@@ -1,3 +1,4 @@
+pub mod prompt_review;
 pub mod relevant_files;
 pub mod types;
 use super::code_analyst::{self, types::PathInfo};
@@ -19,8 +20,10 @@ impl PathInfo {
     ) -> Result<types::PrompterRequestFiles, String> {
         // let cwd = &self.project_dir;
         let request_files = types::RelevantFilesRequest::new(self, message);
-        let request_files = request_files.fetch_relevant_files().await?.files;
+        let request_files = request_files.fetch_relevant_files().await?;
+        let project_tips = request_files.project_tips;
         let relevant_files: Vec<types::PrompterRequestFile> = request_files
+            .files
             .iter()
             .map(|file| types::PrompterRequestFile {
                 path: file.path.clone(),
@@ -61,6 +64,7 @@ impl PathInfo {
         return Ok(types::PrompterRequestFiles {
             can_create: true,
             can_read: true,
+            project_tips,
             context: context_files,
         });
     }

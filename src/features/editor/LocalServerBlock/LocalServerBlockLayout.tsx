@@ -53,7 +53,7 @@ export function LocalServerBlockLayout({ projectUid, commands }: Props) {
             <PlayIcon />
           </span>
         );
-        const stopButton = commandIsRunning && (
+        const stopButton = commandIsRunning && !!(task?.pid || 0 > 0) && (
           <span onClick={() => stopLocalServer(command)}>
             <StopIcon />
           </span>

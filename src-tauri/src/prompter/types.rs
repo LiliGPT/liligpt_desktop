@@ -15,7 +15,7 @@ pub struct PrompterResponse {
     pub actions: Vec<PrompterResponseAction>,
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct PrompterResponseAction {
     pub action_type: PrompterResponseActionType,
     pub content: String,
@@ -30,18 +30,21 @@ pub enum PrompterResponseStatus {
     Fail,
 }
 
-#[derive(strum::Display, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, PartialEq, strum::Display, serde::Serialize, serde::Deserialize)]
 pub enum PrompterResponseActionType {
     #[serde(rename = "create_file")]
     CreateFile,
     #[serde(rename = "update_file")]
     UpdateFile,
+    #[serde(rename = "delete_file")]
+    DeleteFile,
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PrompterRequestFiles {
     pub can_create: bool,
     pub can_read: bool,
+    pub project_tips: String,
     pub context: Vec<PrompterRequestFile>,
 }
 
@@ -64,10 +67,12 @@ pub struct RelevantFilesRequest {
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct RelevantFilesResponse {
+    pub project_tips: String,
     pub files: Vec<RelevantFile>,
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct RelevantFile {
     pub path: String,
+    pub wc: bool, // wc = "with content?"
 }

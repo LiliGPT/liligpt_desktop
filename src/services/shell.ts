@@ -51,13 +51,13 @@ export async function shellSpawn({
   cmd.on('error', onError);
   cmd.on('close', onExit);
   const child = await cmd.spawn();
-  child.write(`echo $$ $PPID\n`);
   child.write(`${command}\n`);
+  // child.write(`echo $$ $PPID $!\n`);
   await delay(5000);
   // get the right pid
   let pid;
   try {
-    pid = await rustRunShellCommand(cwd, `pgrep -P $(ps -ax | tail -10 | grep "${command}" | grep -v grep | tail -1 | awk '{print $1}')`);
+    pid = await rustRunShellCommand(cwd, `ps -ax | grep Sl+ | grep -v grep | awk '{print $1}' | tail -1`);
   } catch (err) {
     console.log(`[shellSpawn] pid error: ${err}`);
   }

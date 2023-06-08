@@ -177,3 +177,16 @@ export async function rustPromptDelete(promptId: string): Promise<void> {
     });
   });
 };
+
+export async function rustPromptSubmitReview(projectDir: string, promptId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { promptId, cwd: projectDir };
+    invoke("rust_prompt_submit_review", request).then(response => {
+      console.log(`[rustPromptSubmitReview]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustPromptSubmitReview]`, { request, error });
+      reject(error);
+    });
+  });
+}

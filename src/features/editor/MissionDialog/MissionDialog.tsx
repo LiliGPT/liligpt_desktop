@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { MissionInput } from "./MissionInput";
 import { useAppSelector } from "../../../redux/hooks";
 import { ReduxProject, selectCurrentProject } from "../../../redux/slices/projectsSlice";
-import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete } from "../../../services/rust";
+import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview } from "../../../services/rust";
 import { ExecutableAction } from "./ExecutableAction";
 
 interface Props {
@@ -33,9 +33,21 @@ export function MissionDialog({ open, onClose }: Props) {
     resultMessage: undefined,
   });
 
+  const resetMission = () => {
+    const newMission: MissionState = {
+      loading: false,
+      prompt: undefined,
+      promptError: undefined,
+      response: undefined,
+      responseError: undefined,
+      resultMessage: undefined,
+    };
+    setMission(newMission);
+  };
+
   const onSubmitMission = async () => {
     if (mission.response?.prompt_id) {
-      await onDeletePrompt();
+      await onClickDeletePromptButton();
     }
     setMission({
       loading: true,
@@ -85,20 +97,13 @@ export function MissionDialog({ open, onClose }: Props) {
     });
   };
 
-  const onDeletePrompt = async () => {
+  const onClickDeletePromptButton = async () => {
     setMission({
       ...mission,
       loading: true,
     });
     await rustPromptDelete(mission.response!.prompt_id);
-    setMission({
-      ...mission,
-      loading: false,
-      prompt: undefined,
-      promptError: undefined,
-      response: undefined,
-      responseError: undefined,
-    });
+    resetMission();
   };
 
   const onApprovePrompt = async () => {
@@ -113,6 +118,22 @@ export function MissionDialog({ open, onClose }: Props) {
       resultMessage: 'Mission complete!',
     });
     setMessage('');
+  };
+
+  const onClickSetMissionFailed = async () => {
+    await onClickDeletePromptButton();
+  };
+
+  const onClickCloseMission = () => {
+    resetMission();
+  };
+
+  // ideias:
+  // - antes de abrir o modal de missões eu podia exigir que tenha um repo git e que ele esteja sem alterações no git status + um botão de retry
+  // - o botão de "reverter" poderia reverter as alterações do git
+  const onClickSendReviewMission = async () => {
+    rustPromptSubmitReview(project.projectDir, mission.response!.prompt_id);
+    resetMission();
   };
 
   let content;
@@ -130,7 +151,7 @@ export function MissionDialog({ open, onClose }: Props) {
         {!mission.loading && !mission.resultMessage && (
           <div className="mb-6 py-2">
             <button
-              onClick={onDeletePrompt}
+              onClick={onClickDeletePromptButton}
               className="px-2 py-0.5 mt-0.5 bg-red-100 border-red-200 hover:bg-red-200 hover:border-red-300 border-2 rounded-md cursor-pointer"
             >cancel</button>
             <button
@@ -180,9 +201,26 @@ export function MissionDialog({ open, onClose }: Props) {
           </div>
         )}
         {!!mission.resultMessage && (
-          <div className="py-5 text-green-700">
-            {mission.resultMessage}
-          </div>
+          <>
+            <div className="pt-5 pb-2 text-green-700">
+              {mission.resultMessage}
+            </div>
+            <div className="text-xs pb-8">
+              <button
+                onClick={onClickSetMissionFailed}
+                className="px-2 py-0.5 mt-0.5 bg-red-100 border-red-200 hover:bg-red-200 hover:border-red-300 border-2 rounded-md cursor-pointer"
+              >set failed</button>
+              <button
+                onClick={onClickSendReviewMission}
+                className="px-2 py-0.5 mt-0.5 bg-green-100 border-green-200 hover:bg-green-200 hover:border-green-300 border-2 rounded-md ml-1 cursor-pointer"
+              >commit local changes</button>
+              <button
+                onClick={onClickCloseMission}
+                className="px-2 py-0.5 mt-0.5 bg-gray-100 border-gray-200 hover:bg-gray-200 hover:border-gray-300 border-2 rounded-md ml-1 cursor-pointer"
+              >close mission</button>
+
+            </div>
+          </>
         )}
       </div>
       <DialogActions>

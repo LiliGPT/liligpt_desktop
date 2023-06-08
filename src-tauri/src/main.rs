@@ -28,6 +28,7 @@ fn main() {
             tauri_commands::rust_prompt_create::rust_prompt_create,
             tauri_commands::rust_prompt_delete::rust_prompt_delete,
             tauri_commands::rust_prompt_approve_and_run::rust_prompt_approve_and_run,
+            tauri_commands::rust_prompt_submit_review::rust_prompt_submit_review,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "../../redux/hooks";
 import { openProjectThunk } from "../../redux/slices/projectsSlice";
-import { ProjectFromRust } from "../../services/rust";
+import { ProjectFromRust, rustPromptSubmitReview } from "../../services/rust";
+import { invoke } from "@tauri-apps/api";
 
 const ENABLE_INITIAL_DISPATCHER = false;
 
@@ -21,24 +22,7 @@ function _InitialDispatcher() {
         subprojects: [],
       };
       // open the project
-      await dispatch(openProjectThunk(project));
-      //   // start running the command line
-      //   await dispatch(runLocalServerCommandThunk('npm run start:dev'));
-      //   // open the screen/dialog to see details about the local server
-      //   await dispatch(openLocalServerThunk('npm run start:dev'));
-      //   // add a log to the local server
-      //   const log: LocalServerLogBlock = {
-      //     message: 'Starting server...',
-      //     timestamp: new Date().toISOString(),
-      //     id: 9999999,
-      //     type: 'internal',
-      //   }
-      //   await dispatch(addLogToLocalServer({
-      //     log,
-      //     serverName: 'npm run start:dev',
-      //   }));
-      //   await delay(13000);
-      //   await dispatch(stopLocalServerThunk('npm run start:dev'));
+      // await dispatch(openProjectThunk(project));
     }
     run();
   }, []);
