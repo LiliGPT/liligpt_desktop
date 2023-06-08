@@ -1,18 +1,20 @@
-#[derive(strum::Display, serde::Serialize, serde::Deserialize)]
+#[derive(strum::Display, serde::Serialize, serde::Deserialize, Default, Clone)]
 pub enum CodeLanguage {
     NodeJs,
     NodeTs,
     // JavascriptJs,
     // JavascriptTs,
+    #[default]
     Unknown,
 }
 
-#[derive(strum::Display, serde::Serialize, serde::Deserialize)]
+#[derive(strum::Display, serde::Serialize, serde::Deserialize, Default, Clone)]
 pub enum Framework {
     // instead of serializing as NodeTs, I want to serialize as Nest
     NodeNest,
     NodeExpress,
     Tauri,
+    #[default]
     Unknown,
 }
 
@@ -24,7 +26,7 @@ pub struct SubprojectDescriptor {
     pub framework: Framework,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Default)]
 pub struct PathInfo {
     pub project_dir: String,
     pub code_language: CodeLanguage,
