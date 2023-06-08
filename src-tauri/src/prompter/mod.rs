@@ -1,4 +1,4 @@
-pub mod context_files;
+pub mod relevant_files;
 pub mod types;
 use super::code_analyst::{self, types::PathInfo};
 pub use types::{PrompterRequest, PrompterResponse, PrompterResponseActionType};
@@ -20,41 +20,6 @@ impl PathInfo {
         // let cwd = &self.project_dir;
         let request_files = types::RelevantFilesRequest::new(self, message);
         let request_files = request_files.fetch_relevant_files().await?.files;
-        // let request_files = match self.framework {
-        //     Framework::NodeNest => {
-        //         vec![
-        //             PrompterRequestFile {
-        //                 path: "src/main.ts".to_string(),
-        //                 content: Self::get_file_content(cwd, "src/main.ts"),
-        //             },
-        //             PrompterRequestFile {
-        //                 path: "src/app.module.ts".to_string(),
-        //                 content: Self::get_file_content(cwd, "src/app.module.ts"),
-        //             },
-        //             PrompterRequestFile {
-        //                 path: "src/app.controller.ts".to_string(),
-        //                 content: None,
-        //             },
-        //             PrompterRequestFile {
-        //                 path: "src/app.service.ts".to_string(),
-        //                 content: None,
-        //             },
-        //             PrompterRequestFile {
-        //                 path: "src/example/example.module.ts".to_string(),
-        //                 content: None,
-        //             },
-        //             PrompterRequestFile {
-        //                 path: "src/example/example.controller.ts".to_string(),
-        //                 content: None,
-        //             },
-        //             PrompterRequestFile {
-        //                 path: "src/example/example.service.ts".to_string(),
-        //                 content: None,
-        //             },
-        //         ]
-        //     }
-        //     _ => vec![],
-        // };
         let relevant_files: Vec<types::PrompterRequestFile> = request_files
             .iter()
             .map(|file| types::PrompterRequestFile {

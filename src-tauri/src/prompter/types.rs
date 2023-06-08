@@ -25,9 +25,9 @@ pub struct PrompterResponseAction {
 #[derive(strum::Display, serde::Serialize, serde::Deserialize)]
 pub enum PrompterResponseStatus {
     InProgress,
+    Approved,
     Ok,
     Fail,
-    NeedsRetry,
 }
 
 #[derive(strum::Display, serde::Serialize, serde::Deserialize)]
