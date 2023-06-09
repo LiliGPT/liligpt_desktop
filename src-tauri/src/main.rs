@@ -27,8 +27,10 @@ fn main() {
             tauri_commands::rust_prompt_prepare::rust_prompt_prepare,
             tauri_commands::rust_prompt_create::rust_prompt_create,
             tauri_commands::rust_prompt_delete::rust_prompt_delete,
+            tauri_commands::rust_prompt_set_ok::rust_prompt_set_ok,
             tauri_commands::rust_prompt_approve_and_run::rust_prompt_approve_and_run,
             tauri_commands::rust_prompt_submit_review::rust_prompt_submit_review,
+            tauri_commands::fetch_missions::fetch_missions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

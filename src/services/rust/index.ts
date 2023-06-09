@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/tauri";
+import { ReduxMission, ReduxMissionAction } from "../../redux/slices/missionsSlice";
 
 export interface SubprojectFromRust {
   name: string;
@@ -110,11 +111,12 @@ export interface PreparedPromptFromRust {
     context: PromptContextFile[];
   };
 }
-export interface PromptResponseFromRust {
-  prompt_id: string;
-  status: string; // Ok
-  actions: PromptAction[],
+export interface PromptResponseFromRust extends ReduxMission {
+  // prompt_id: string;
+  // status: string; // Ok
+  // actions: PromptAction[],
 }
+interface Mission extends PromptResponseFromRust { }
 
 interface PromptContextFile {
   path: string;
@@ -178,6 +180,19 @@ export async function rustPromptDelete(promptId: string): Promise<void> {
   });
 };
 
+export async function rustPromptSetOk(promptId: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { promptId };
+    invoke("rust_prompt_set_ok", request).then(response => {
+      console.log(`[rustPromptDelete]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustPromptDelete]`, { request, error });
+      reject(error);
+    });
+  });
+};
+
 export async function rustPromptSubmitReview(projectDir: string, promptId: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = { promptId, cwd: projectDir };
@@ -186,6 +201,19 @@ export async function rustPromptSubmitReview(projectDir: string, promptId: strin
       resolve();
     }).catch(error => {
       console.log(`[rustPromptSubmitReview]`, { request, error });
+      reject(error);
+    });
+  });
+}
+
+export async function rustFetchMissions(): Promise<ReduxMission[]> {
+  return new Promise((resolve, reject) => {
+    const request = {};
+    invoke("fetch_missions", request).then(response => {
+      console.log(`[rustFetchMissions]`, { request, response });
+      resolve(response as ReduxMission[]);
+    }).catch(error => {
+      console.log(`[rustFetchMissions]`, { request, error });
       reject(error);
     });
   });

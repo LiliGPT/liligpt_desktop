@@ -1,3 +1,4 @@
+pub mod missions;
 pub mod prompt_review;
 pub mod relevant_files;
 pub mod types;

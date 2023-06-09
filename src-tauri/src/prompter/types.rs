@@ -11,8 +11,12 @@ pub struct PrompterRequest {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PrompterResponse {
     pub prompt_id: String,
+    pub message: String,
     pub status: PrompterResponseStatus,
     pub actions: Vec<PrompterResponseAction>,
+    pub original_actions: Vec<PrompterResponseAction>,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, PartialEq, serde::Serialize, serde::Deserialize)]

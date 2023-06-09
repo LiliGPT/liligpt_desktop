@@ -4,7 +4,7 @@ import { MissionInput } from "./MissionInput";
 import { useAppSelector } from "../../../redux/hooks";
 import { ReduxProject, selectCurrentProject } from "../../../redux/slices/projectsSlice";
 import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview } from "../../../services/rust";
-import { ExecutableAction } from "./ExecutableAction";
+import { MissionActions } from "../../missions/MissionActions";
 
 interface Props {
   open: boolean;
@@ -145,9 +145,7 @@ export function MissionDialog({ open, onClose }: Props) {
         <div
           className="mb-2"
         >action plan: ({mission.response.prompt_id})</div>
-        {mission.response.actions.map((action, i) => (
-          <ExecutableAction key={i} {...action} />
-        ))}
+        <MissionActions mission={mission.response} />
         {!mission.loading && !mission.resultMessage && (
           <div className="mb-6 py-2">
             <button
