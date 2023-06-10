@@ -218,3 +218,16 @@ export async function rustFetchMissions(): Promise<ReduxMission[]> {
     });
   });
 }
+
+export async function rustReplaceMissionActions(promptId: string, actions: ReduxMissionAction[]): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { promptId, actions };
+    invoke("rust_prompt_replace_actions", request).then(response => {
+      console.log(`[rustReplaceMissionActions]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustReplaceMissionActions]`, { request, error });
+      reject(error);
+    });
+  });
+}

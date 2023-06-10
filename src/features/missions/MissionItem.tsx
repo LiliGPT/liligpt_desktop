@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ReduxMission, ReduxMissionAction, ReduxMissionStatus, fetchMissionsThunk } from "../../redux/slices/missionsSlice";
+import { ReduxMission, ReduxMissionAction, ReduxMissionStatus, fetchMissionsThunk, removeMissionActionThunk } from "../../redux/slices/missionsSlice";
 import { MissionActions } from "./MissionActions";
 import { Close, Edit } from "@mui/icons-material";
 import { CustomButton } from "../buttons/CustomButton";
@@ -33,7 +33,7 @@ export function MissionItem(mission: Props) {
   if (!loading && editionMode) {
     onClickDeleteFile = async (action: ReduxMissionAction) => {
       setLoading(true);
-      // todo next: delete file
+      await dispatch(removeMissionActionThunk(mission.prompt_id, action));
       setLoading(false);
       setEditionMode(false);
     };
