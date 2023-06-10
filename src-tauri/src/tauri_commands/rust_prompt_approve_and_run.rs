@@ -38,19 +38,19 @@ async fn run_prompt(path: &str, prompt_id: &str) -> Result<(), String> {
                 let parent = file_path.parent().unwrap();
                 let _mkdir = std::fs::create_dir_all(parent).ok();
                 // create file with content
-                std::fs::write(file_path, action.content).expect("write file failed")
+                std::fs::write(file_path, action.content).ok()
             }
             prompter::PrompterResponseActionType::UpdateFile => {
                 let file_path = format!("{}/{}", path, action.path);
                 let file_path = std::path::Path::new(&file_path);
                 // overwrite file with content
-                std::fs::write(file_path, action.content).expect("write file failed")
+                std::fs::write(file_path, action.content).ok()
             }
             prompter::PrompterResponseActionType::DeleteFile => {
                 let file_path = format!("{}/{}", path, action.path);
                 let file_path = std::path::Path::new(&file_path);
                 // delete file
-                std::fs::remove_file(file_path).ok();
+                std::fs::remove_file(file_path).ok()
             }
         };
     }

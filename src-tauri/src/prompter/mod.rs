@@ -15,15 +15,29 @@ impl PathInfo {
         }
     }
 
-    pub async fn get_prompter_request_files(
+    pub async fn get_prompter_request(
         &self,
         message: &str,
-    ) -> Result<types::PrompterRequestFiles, String> {
-        // let cwd = &self.project_dir;
+    ) -> Result<types::PrompterRequest, String> {
         let request_files = types::RelevantFilesRequest::new(self, message);
         let request_files = request_files.fetch_relevant_files().await?;
-        let project_tips = request_files.project_tips;
-        let relevant_files: Vec<types::PrompterRequestFile> = request_files
+        let prompter_request_files = self.get_prompter_request_files(&request_files).await?;
+        Ok(types::PrompterRequest {
+            prompt_request_id: request_files.prompt_request_id,
+            message: message.to_string(),
+            code_language: self.code_language.clone(),
+            framework: self.framework.clone(),
+            files: prompter_request_files,
+        })
+    }
+
+    pub async fn get_prompter_request_files(
+        &self,
+        relevant_files_response: &types::RelevantFilesResponse,
+    ) -> Result<types::PrompterRequestFiles, String> {
+        // let cwd = &self.project_dir;
+        let project_tips = &relevant_files_response.project_tips;
+        let relevant_files: Vec<types::PrompterRequestFile> = relevant_files_response
             .files
             .iter()
             .map(|file| types::PrompterRequestFile {
@@ -65,7 +79,7 @@ impl PathInfo {
         return Ok(types::PrompterRequestFiles {
             can_create: true,
             can_read: true,
-            project_tips,
+            project_tips: project_tips.clone(),
             context: context_files,
         });
     }

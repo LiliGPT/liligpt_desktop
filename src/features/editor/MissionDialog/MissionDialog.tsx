@@ -132,7 +132,7 @@ export function MissionDialog({ open, onClose }: Props) {
   // - antes de abrir o modal de missões eu podia exigir que tenha um repo git e que ele esteja sem alterações no git status + um botão de retry
   // - o botão de "reverter" poderia reverter as alterações do git
   const onClickSendReviewMission = async () => {
-    rustPromptSubmitReview(project.projectDir, mission.response!.prompt_id);
+    await rustPromptSubmitReview(project.projectDir, mission.response!.prompt_id);
     resetMission();
   };
 

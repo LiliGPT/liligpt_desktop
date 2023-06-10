@@ -2,6 +2,7 @@ use super::super::code_analyst;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct PrompterRequest {
+    pub prompt_request_id: String,
     pub message: String,
     pub code_language: code_analyst::types::CodeLanguage,
     pub framework: code_analyst::types::Framework,
@@ -71,6 +72,7 @@ pub struct RelevantFilesRequest {
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct RelevantFilesResponse {
+    pub prompt_request_id: String,
     pub project_tips: String,
     pub files: Vec<RelevantFile>,
 }

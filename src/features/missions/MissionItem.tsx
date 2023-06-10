@@ -3,7 +3,7 @@ import { ReduxMission, ReduxMissionAction, ReduxMissionStatus, fetchMissionsThun
 import { MissionActions } from "./MissionActions";
 import { Close, Edit } from "@mui/icons-material";
 import { CustomButton } from "../buttons/CustomButton";
-import { rustPromptDelete, rustPromptSetOk } from "../../services/rust";
+import { rustPromptDelete, rustPromptSetOk, rustPromptSubmitReview } from "../../services/rust";
 import { useAppDispatch } from "../../redux/hooks";
 
 interface Props extends ReduxMission { }

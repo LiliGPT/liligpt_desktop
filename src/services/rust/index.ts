@@ -102,6 +102,7 @@ export function rustInstallDependencies(cwd: string): Promise<void> {
 // Prompter
 
 export interface PreparedPromptFromRust {
+  prompt_request_id: string;
   message: string;
   code_language: string;
   framework: string;

@@ -19,17 +19,15 @@ pub async fn review_prompt(project_dir: &str, prompt_id: &str) -> Result<(), Str
         .json(&reviewed_actions)
         .send()
         .await;
-    let response = match response {
-        Ok(response) => response,
-        Err(error) => return Err(format!("Failed to fetch relevant files (0x1): {}", error)),
-    };
-
-    let response = response.json::<RelevantFilesResponse>().await;
     let _response = match response {
         Ok(response) => response,
-        Err(error) => return Err(format!("Failed to parse relevant files (0x2): {}", error)),
+        Err(error) => {
+            return Err(format!(
+                "Failed to fetch relevant files (0x1): {} - actions: {:?}",
+                error, &reviewed_actions
+            ))
+        }
     };
-
     Ok(())
 }
 
@@ -51,6 +49,12 @@ fn get_prompt_actions_from_path(repo_path: &Path) -> Vec<PrompterResponseAction>
             PrompterResponseActionType::UpdateFile
         };
         let content = if action_type != PrompterResponseActionType::DeleteFile {
+            println!(
+                "[prompt_review.get_prompt_actions_from_path] reading action file: {} {}/{}",
+                &action_type,
+                &repo_path.display(),
+                &file_path
+            );
             std::fs::read_to_string(repo_path.join(&file_path)).unwrap()
         } else {
             "".to_string()
@@ -61,5 +65,6 @@ fn get_prompt_actions_from_path(repo_path: &Path) -> Vec<PrompterResponseAction>
             path: file_path,
         });
     }
+    println!("actions: {:?}", &actions);
     actions
 }
