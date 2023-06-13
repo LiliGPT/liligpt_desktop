@@ -3,6 +3,7 @@
 #![allow(unused_must_use)]
 
 mod code_analyst;
+mod code_missions_api;
 mod database;
 mod io;
 mod prompter;
@@ -32,6 +33,9 @@ fn main() {
             tauri_commands::rust_prompt_submit_review::rust_prompt_submit_review,
             tauri_commands::fetch_missions::fetch_missions,
             tauri_commands::rust_prompt_replace_actions::rust_prompt_replace_actions,
+            tauri_commands::create_mission::create_mission_command,
+            tauri_commands::execute_mission::execute_mission_command,
+            tauri_commands::search_executions::search_executions_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

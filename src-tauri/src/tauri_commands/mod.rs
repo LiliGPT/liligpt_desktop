@@ -1,3 +1,5 @@
+pub mod create_mission;
+pub mod execute_mission;
 pub mod fetch_missions;
 pub mod get_file_tree;
 pub mod get_test_scripts;
@@ -11,3 +13,4 @@ pub mod rust_prompt_prepare;
 pub mod rust_prompt_replace_actions;
 pub mod rust_prompt_set_ok;
 pub mod rust_prompt_submit_review;
+pub mod search_executions;

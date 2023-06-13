@@ -5,6 +5,8 @@ pub mod subprojects;
 pub mod tests;
 pub mod types;
 
+pub use types::*;
+
 pub use tests::get_test_scripts;
 
 pub fn get_path_info(path: &str) -> Result<types::PathInfo, String> {

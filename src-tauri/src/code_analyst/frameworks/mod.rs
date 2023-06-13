@@ -5,14 +5,8 @@ pub fn detect_framework_from_path(
     language: &super::types::CodeLanguage,
 ) -> super::types::Framework {
     match language {
-        super::types::CodeLanguage::NodeJs => {
+        super::types::CodeLanguage::Javascript => {
             // todo: javascript should be different
-            let framework = super::frameworks::nodets::detect_nodets_framework(project_dir);
-            if let Some(framework) = framework {
-                return framework;
-            }
-        }
-        super::types::CodeLanguage::NodeTs => {
             let framework = super::frameworks::nodets::detect_nodets_framework(project_dir);
             if let Some(framework) = framework {
                 return framework;
@@ -30,12 +24,7 @@ pub fn is_dependencies_installed(
     language: &super::types::CodeLanguage,
 ) -> Result<bool, String> {
     match language {
-        super::types::CodeLanguage::NodeJs => {
-            return Ok(super::dependencies::nodets::is_dependencies_installed(
-                project_dir,
-            ));
-        }
-        super::types::CodeLanguage::NodeTs => {
+        super::types::CodeLanguage::Javascript => {
             return Ok(super::dependencies::nodets::is_dependencies_installed(
                 project_dir,
             ));
@@ -53,8 +42,7 @@ pub fn get_local_server_commands(
 ) -> Result<Vec<String>, String> {
     // read projectJson at project_dir
     match code_language {
-        super::types::CodeLanguage::NodeJs => Ok(node_commands(project_dir).unwrap_or(vec![])),
-        super::types::CodeLanguage::NodeTs => Ok(node_commands(project_dir).unwrap_or(vec![])),
+        super::types::CodeLanguage::Javascript => Ok(node_commands(project_dir).unwrap_or(vec![])),
         super::types::CodeLanguage::Unknown => Ok(vec![]),
     }
 }

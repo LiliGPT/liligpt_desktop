@@ -1,18 +1,17 @@
-pub mod nodejs;
-pub mod nodets;
+pub mod javascript;
 
 pub fn detect_code_language_from_path(
     project_dir: &str,
 ) -> Result<super::types::CodeLanguage, String> {
-    // NodeTs
-    let nodets = crate::code_analyst::languages::nodets::detect_nodets(project_dir);
+    // Javascript: NodeTs
+    let nodets = crate::code_analyst::languages::javascript::detect_nodets(project_dir);
     if nodets.is_ok() {
-        return Ok(super::types::CodeLanguage::NodeTs);
+        return Ok(super::types::CodeLanguage::Javascript);
     }
-    // NodeJs
-    let nodejs = crate::code_analyst::languages::nodejs::detect_nodejs(project_dir);
+    // Javascript: NodeJs
+    let nodejs = crate::code_analyst::languages::javascript::detect_nodejs(project_dir);
     if nodejs.is_ok() {
-        return Ok(super::types::CodeLanguage::NodeJs);
+        return Ok(super::types::CodeLanguage::Javascript);
     }
     Ok(super::types::CodeLanguage::Unknown)
 }

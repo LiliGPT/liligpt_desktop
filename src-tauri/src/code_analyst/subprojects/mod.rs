@@ -8,7 +8,7 @@ pub fn get_subprojects(
     _framework: &types::Framework,
 ) -> Vec<types::SubprojectDescriptor> {
     match code_language {
-        types::CodeLanguage::NodeJs => javascript::get_subprojects(path),
+        types::CodeLanguage::Javascript => javascript::get_subprojects(path),
         _ => vec![],
     }
 }
