@@ -46,7 +46,7 @@ export function MissionDialog({ open, onClose }: Props) {
   };
 
   const onSubmitMission = async () => {
-    if (mission.response?.prompt_id) {
+    if (mission.response?.mission_id) {
       await onClickDeletePromptButton();
     }
     setMission({
@@ -102,7 +102,7 @@ export function MissionDialog({ open, onClose }: Props) {
       ...mission,
       loading: true,
     });
-    await rustPromptDelete(mission.response!.prompt_id);
+    await rustPromptDelete(mission.response!.mission_id);
     resetMission();
   };
 
@@ -111,7 +111,7 @@ export function MissionDialog({ open, onClose }: Props) {
       ...mission,
       loading: true,
     });
-    await rustPromptApproveAndRun(project.projectDir, mission.response!.prompt_id);
+    await rustPromptApproveAndRun(project.projectDir, mission.response!.mission_id);
     setMission({
       ...mission,
       loading: false,
@@ -132,7 +132,7 @@ export function MissionDialog({ open, onClose }: Props) {
   // - antes de abrir o modal de missões eu podia exigir que tenha um repo git e que ele esteja sem alterações no git status + um botão de retry
   // - o botão de "reverter" poderia reverter as alterações do git
   const onClickSendReviewMission = async () => {
-    await rustPromptSubmitReview(project.projectDir, mission.response!.prompt_id);
+    await rustPromptSubmitReview(project.projectDir, mission.response!.mission_id);
     resetMission();
   };
 
@@ -144,8 +144,8 @@ export function MissionDialog({ open, onClose }: Props) {
       <div className="text-xs">
         <div
           className="mb-2"
-        >action plan: ({mission.response.prompt_id})</div>
-        <MissionActions mission={mission.response} />
+        >action plan: ({mission.response.mission_id})</div>
+        <MissionActions execution={mission.response} />
         {!mission.loading && !mission.resultMessage && (
           <div className="mb-6 py-2">
             <button

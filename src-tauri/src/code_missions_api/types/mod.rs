@@ -20,9 +20,11 @@ mod mission_data {
 }
 
 mod mission_execution {
+    mod mission_execution;
     mod mission_execution_context_file;
     mod mission_execution_status;
 
+    pub use mission_execution::MissionExecution;
     pub use mission_execution_context_file::MissionExecutionContextFile;
     pub use mission_execution_status::MissionExecutionStatus;
 }

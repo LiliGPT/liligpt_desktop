@@ -1,7 +1,7 @@
 import { useAppSelector } from "../../redux/hooks";
 import { ReduxCoreView, selectCoreView } from "../../redux/slices/coreSlice";
 import { EditorView } from "../editor/EditorView";
-import { MissionsView } from "../missions/MIssionsView";
+import { MissionsView } from "../missions/MissionsView";
 import { MainAppSidebar } from "./MainAppSidebar";
 
 function MainAppLayout() {

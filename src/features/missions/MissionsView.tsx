@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { ReduxMission, ReduxMissionAction, fetchMissionsThunk, selectMissions } from "../../redux/slices/missionsSlice";
+import { fetchExecutionsThunk, selectExecutions } from "../../redux/slices/missionsSlice";
 import { MissionItem } from "./MissionItem";
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
+import { MissionExecution } from "../../services/rust/rust";
 
 export function MissionsView() {
   const dispatch = useAppDispatch();
-  const missions = useAppSelector(selectMissions);
+  const executions = useAppSelector(selectExecutions);
 
   useEffect(() => {
-    dispatch(fetchMissionsThunk());
+    dispatch(fetchExecutionsThunk());
   }, []);
 
-  const missionsComponents = missions.map((mission: ReduxMission) => <MissionItem key={mission.prompt_id} {...mission} />);
+  const executionsComponents = executions.map((mission: MissionExecution) => <MissionItem key={mission.mission_id} {...mission} />);
 
   return (
     <div className="p-2 max-w-2xl">
@@ -21,7 +22,7 @@ export function MissionsView() {
         <MissionFilters />
       </div>
       <div className="">
-        {missionsComponents}
+        {executionsComponents}
       </div>
     </div>
   );

@@ -1,11 +1,13 @@
-use super::{SearchExecutionsRequest, SearchExecutionsResponse};
+use crate::code_missions_api::MissionExecution;
+
+use super::SearchExecutionsRequest;
 
 pub async fn search_executions(
     request: SearchExecutionsRequest,
-) -> Result<SearchExecutionsResponse, String> {
+) -> Result<Vec<MissionExecution>, String> {
     let http_client = reqwest::Client::new();
     let response = http_client
-        .post(&format!("{}/missions/search", dotenv!("PROMPTER_URL")))
+        .post(&format!("{}/executions/search", dotenv!("PROMPTER_URL")))
         .json(&request)
         .send()
         .await;

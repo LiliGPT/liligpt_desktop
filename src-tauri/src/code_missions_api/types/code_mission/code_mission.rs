@@ -9,4 +9,6 @@ pub struct CodeMission {
     pub mission_id: String,
     pub mission_status: CodeMissionStatus,
     pub mission_data: MissionData,
+    pub created_at: String,
+    pub updated_at: Option<String>,
 }

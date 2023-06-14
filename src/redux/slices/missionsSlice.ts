@@ -1,42 +1,20 @@
-import { Dispatch, createSlice } from "@reduxjs/toolkit";
-import { rustFetchMissions, rustReplaceMissionActions } from "../../services/rust";
+import { Dispatch, PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { rustFetchMissions, rustReplaceMissionActions, rustSearchExecutions } from "../../services/rust";
 import { RootState } from "../store";
+import { MissionAction, MissionExecution } from "../../services/rust/rust";
 
 // --- initial state
 
 const initialState: ReduxMissionsState = {
   loading: false,
   errorMessage: '',
-  missions: [],
+  executions: [],
 };
 
 interface ReduxMissionsState {
   loading: boolean;
   errorMessage: string;
-  missions: ReduxMission[];
-}
-
-export enum ReduxMissionStatus {
-  Ok = 'Ok',
-  Approved = 'Approved',
-  Fail = 'Fail',
-  InProgress = 'InProgress',
-}
-
-export interface ReduxMission {
-  prompt_id: string;
-  status: ReduxMissionStatus;
-  message: string;
-  actions: ReduxMissionAction[],
-  original_actions: ReduxMissionAction[],
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ReduxMissionAction {
-  action_type: string; // create_file | update_file
-  content: string | null;
-  path: string;
+  executions: MissionExecution[];
 }
 
 // --- slice
@@ -45,25 +23,25 @@ export const missionsSlice = createSlice({
   name: 'missions',
   initialState,
   reducers: {
-    setLoading: (state: ReduxMissionsState, action: { payload: boolean }) => {
+    setLoading: (state: ReduxMissionsState, action: PayloadAction<boolean>): ReduxMissionsState => {
       return {
         ...state,
         loading: action.payload,
         errorMessage: '',
       };
     },
-    setErrorMessage: (state: ReduxMissionsState, action: { payload: string }) => {
+    setErrorMessage: (state: ReduxMissionsState, action: PayloadAction<string>): ReduxMissionsState => {
       return {
         ...state,
         loading: false,
         errorMessage: action.payload,
       };
     },
-    setMissions: (state: ReduxMissionsState, action: { payload: ReduxMission[] }) => {
+    setExecutions: (state: ReduxMissionsState, action: PayloadAction<MissionExecution[]>): ReduxMissionsState => {
       return {
         ...state,
         loading: false,
-        missions: action.payload,
+        executions: action.payload,
       };
     },
   },
@@ -71,52 +49,53 @@ export const missionsSlice = createSlice({
 
 // --- selectors
 
-export const selectMissions = (state: RootState): ReduxMission[] => {
-  return state.missions.missions;
+export const selectExecutions = (state: RootState): MissionExecution[] => {
+  return state.missions.executions;
 };
 
 // --- thunks
 
-export const fetchMissionsThunk = () => (dispatch: Dispatch, getState: () => RootState): Promise<void> => {
+export const fetchExecutionsThunk = () => (dispatch: Dispatch, getState: () => RootState): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     if (getState().missions.loading) {
-      console.log(`[fetchMissionsThunk] already loading`);
+      console.log(`[fetchExecutionsThunk] already loading`);
       resolve();
       return;
     }
     await dispatch(missionsSlice.actions.setLoading(true));
-    rustFetchMissions().then(async (missions: ReduxMission[]) => {
-      console.log(`[fetchMissionsThunk]`, { missions });
-      await dispatch(missionsSlice.actions.setMissions(missions));
+    const request = { filter: {} };
+    rustSearchExecutions(request).then(async (executions: MissionExecution[]) => {
+      console.log(`[fetchExecutionsThunk]`, { request, response: executions });
+      await dispatch(missionsSlice.actions.setExecutions(executions));
       resolve();
     }).catch(error => {
-      console.log(`[fetchMissionsThunk]`, { error });
+      console.log(`[fetchExecutionsThunk]`, { error });
       reject(error);
     });
   });
 };
 
-export const removeMissionActionThunk = (promptId: string, action: ReduxMissionAction) => (dispatch: Dispatch, getState: () => RootState): Promise<void> => {
+export const removeExecutionActionThunk = (executionId: string, action: MissionAction) => (dispatch: Dispatch, getState: () => RootState): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     if (getState().missions.loading) {
-      console.log(`[removeMissionActionThunk] already loading`);
+      console.log(`[removeExecutionActionThunk] already loading`);
       resolve();
       return;
     }
     await dispatch(missionsSlice.actions.setLoading(true));
-    const missions = selectMissions(getState());
-    const mission = missions.find(mission => mission.prompt_id === promptId);
-    if (!mission) {
-      console.log(`[removeMissionActionThunk] mission not found`);
+    const executions = selectExecutions(getState());
+    const execution = executions.find(execution => execution.execution_id === executionId);
+    if (!execution) {
+      console.log(`[removeExecutionActionThunk] mission not found`);
       await dispatch(missionsSlice.actions.setLoading(false));
       resolve();
       return;
     }
     // const actions = mission.actions.filter(a => (a.path !== action.path && a.action_type !== action.action_type)); // BUGGY ??!
-    const actions = mission.actions.filter(a => (a.path !== action.path));
-    await rustReplaceMissionActions(mission.prompt_id, actions);
+    const actions = execution.original_actions.filter(a => (a.path !== action.path));
+    await rustReplaceMissionActions(execution.mission_id, actions);
     await dispatch(missionsSlice.actions.setLoading(false));
-    await fetchMissionsThunk()(dispatch, getState);
+    await fetchExecutionsThunk()(dispatch, getState);
     resolve();
   });
 };

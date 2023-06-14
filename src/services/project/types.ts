@@ -1,21 +1,3 @@
-export enum CodeLanguage {
-  Python = 'python',
-  Javascript = 'javascript',
-  Java = 'java',
-  Rust = 'rust',
-}
-
-export enum JavascriptCodeFramework {
-  React = 'react',
-  Angular = 'angular',
-  Vue = 'vue',
-  Nestjs = 'nestjs',
-  Nextjs = 'nextjs',
-  Express = 'express',
-}
-
-export type CodeFramework = JavascriptCodeFramework | undefined;
-
 /*
 export enum ProjectFieldKind {
   Text = 'text',

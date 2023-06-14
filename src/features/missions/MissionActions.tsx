@@ -1,18 +1,19 @@
 import { useState } from "react";
-import { ReduxMission, ReduxMissionAction } from "../../redux/slices/missionsSlice";
 import { MissionActionItem } from "./MissionActionItem";
 import { MissionActionDialog } from "./MissionActionDialog";
+import { MissionAction, MissionExecution } from "../../services/rust/rust";
 
 interface Props {
-  mission: ReduxMission;
-  onClickDelete?: ((action: ReduxMissionAction) => Promise<void>);
+  execution: MissionExecution;
+  onClickDelete?: ((action: MissionAction) => Promise<void>);
 }
 
 export function MissionActions(props: Props) {
-  const { mission } = props;
-  const [action, setAction] = useState<ReduxMissionAction | null>(null);
+  const { execution } = props;
+  const [action, setAction] = useState<MissionAction | null>(null);
+  const actions: MissionAction[] = execution.reviewed_actions ?? execution.original_actions ?? [];
 
-  const onClickDelete = (action: ReduxMissionAction) => {
+  const onClickDelete = (action: MissionAction) => {
     if (props.onClickDelete) {
       return () => props.onClickDelete!(action);
     }
@@ -21,8 +22,8 @@ export function MissionActions(props: Props) {
   return (
     <>
       <div className="">
-        {mission.actions.map((action, index) => <MissionActionItem
-          key={`${mission.prompt_id}-act-${index}`}
+        {actions.map((action, index) => <MissionActionItem
+          key={`${execution.mission_id}-act-${index}`}
           onClick={() => setAction(action)}
           onClickDelete={onClickDelete(action)}
           {...action}

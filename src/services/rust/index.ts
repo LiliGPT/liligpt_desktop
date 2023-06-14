@@ -1,5 +1,5 @@
-import { invoke } from "@tauri-apps/api/tauri";
-import { ReduxMission, ReduxMissionAction } from "../../redux/slices/missionsSlice";
+import { InvokeArgs, invoke } from "@tauri-apps/api/tauri";
+import { CodeMission, MissionAction, MissionExecution, SearchExecutionsRequest } from "./rust";
 
 export interface SubprojectFromRust {
   name: string;
@@ -112,7 +112,7 @@ export interface PreparedPromptFromRust {
     context: PromptContextFile[];
   };
 }
-export interface PromptResponseFromRust extends ReduxMission {
+export interface PromptResponseFromRust extends CodeMission {
   // prompt_id: string;
   // status: string; // Ok
   // actions: PromptAction[],
@@ -207,12 +207,12 @@ export async function rustPromptSubmitReview(projectDir: string, promptId: strin
   });
 }
 
-export async function rustFetchMissions(): Promise<ReduxMission[]> {
+export async function rustFetchMissions(): Promise<CodeMission[]> {
   return new Promise((resolve, reject) => {
     const request = {};
     invoke("fetch_missions", request).then(response => {
       console.log(`[rustFetchMissions]`, { request, response });
-      resolve(response as ReduxMission[]);
+      resolve(response as CodeMission[]);
     }).catch(error => {
       console.log(`[rustFetchMissions]`, { request, error });
       reject(error);
@@ -220,7 +220,7 @@ export async function rustFetchMissions(): Promise<ReduxMission[]> {
   });
 }
 
-export async function rustReplaceMissionActions(promptId: string, actions: ReduxMissionAction[]): Promise<void> {
+export async function rustReplaceMissionActions(promptId: string, actions: MissionAction[]): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = { promptId, actions };
     invoke("rust_prompt_replace_actions", request).then(response => {
@@ -228,6 +228,20 @@ export async function rustReplaceMissionActions(promptId: string, actions: Redux
       resolve();
     }).catch(error => {
       console.log(`[rustReplaceMissionActions]`, { request, error });
+      reject(error);
+    });
+  });
+}
+
+// --- New commands
+
+export async function rustSearchExecutions(request: SearchExecutionsRequest): Promise<MissionExecution[]> {
+  return new Promise((resolve, reject) => {
+    invoke("search_executions_command", { request }).then(response => {
+      console.log(`[rustSearchExecutions]`, { request, response });
+      resolve(response as MissionExecution[]);
+    }).catch(error => {
+      console.log(`[rustSearchExecutions]`, { request, error });
       reject(error);
     });
   });
