@@ -1,13 +1,14 @@
 pub mod dependencies;
 pub mod frameworks;
 pub mod languages;
+pub mod project_files;
+pub mod review_actions;
 pub mod subprojects;
 pub mod tests;
 pub mod types;
 
-pub use types::*;
-
 pub use tests::get_test_scripts;
+pub use types::*;
 
 pub fn get_path_info(path: &str) -> Result<types::PathInfo, String> {
     let code_language =
@@ -18,15 +19,6 @@ pub fn get_path_info(path: &str) -> Result<types::PathInfo, String> {
     let local_server_commands =
         frameworks::get_local_server_commands(path, &code_language, &framework).unwrap_or(vec![]);
     let subprojects = subprojects::get_subprojects(path, &code_language, &framework);
-
-    // return Ok(serde_json::json!({
-    //   "project_dir": path,
-    //   "code_language": code_language.to_string(),
-    //   "framework": framework.to_string(),
-    //   "dependencies_installed": dependencies_installed,
-    //   "local_server_commands": local_server_commands,
-    //   "subprojects": subprojects,
-    // }));
     Ok(types::PathInfo {
         project_dir: path.to_string(),
         code_language,

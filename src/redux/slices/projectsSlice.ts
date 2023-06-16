@@ -152,11 +152,11 @@ export const projectsSlice = createSlice({
 export const selectCurrentProject = () => (state: RootState): ReduxProject | undefined => {
   const currentProject = state.projects.projects.find(project => project.projectUid === state.projects.openedProjectUid);
   if (!currentProject && state.projects.projects.length > 0) {
-    console.log(
-      '[projectsSlice.selectors.selectCurrentProject] No current project. This should be fixed!',
-      state.projects.openedProjectUid,
-      state.projects.projects,
-    );
+    // console.log(
+    //   '[projectsSlice.selectors.selectCurrentProject] No current project. This should be fixed!',
+    //   state.projects.openedProjectUid,
+    //   state.projects.projects,
+    // );
     return state.projects.projects[0];
   }
   return currentProject;

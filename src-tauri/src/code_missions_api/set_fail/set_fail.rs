@@ -8,16 +8,11 @@ pub async fn set_fail(request: SetFailRequest) -> Result<(), String> {
             dotenv!("PROMPTER_URL"),
             request.execution_id
         ))
-        .json(&request)
         .send()
         .await;
-    let response = match response {
+    let _response = match response {
         Ok(response) => response,
         Err(err) => return Err(format!("[set_fail] response error: {}", err)),
     };
-    let response_text = match response.json().await {
-        Ok(resp) => resp,
-        Err(err) => return Err(format!("[set_fail] json error: {}", err)),
-    };
-    Ok(response_text)
+    Ok(())
 }

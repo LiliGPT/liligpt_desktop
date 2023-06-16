@@ -3,7 +3,7 @@ import { fetchExecutionsThunk, removeExecutionActionThunk } from "../../redux/sl
 import { MissionActions } from "./MissionActions";
 import { Close, Edit } from "@mui/icons-material";
 import { CustomButton } from "../buttons/CustomButton";
-import { rustPromptDelete, rustPromptSetOk, rustPromptSubmitReview } from "../../services/rust";
+import { rustExecutionDelete, rustExecutionSetPerfect, rustPromptSubmitReview } from "../../services/rust";
 import { useAppDispatch } from "../../redux/hooks";
 import { MissionAction, MissionExecution, MissionExecutionStatus } from "../../services/rust/rust";
 
@@ -16,15 +16,15 @@ export function MissionItem(execution: Props) {
 
   const onClickFail = async () => {
     setLoading(true);
-    await rustPromptDelete(execution.execution_id);
+    await rustExecutionDelete(execution.execution_id);
     await dispatch(fetchExecutionsThunk());
     setLoading(false);
     setEditionMode(false);
   };
 
-  const onClickConfirm = async () => {
+  const onClickSetPerfect = async () => {
     setLoading(true);
-    await rustPromptSetOk(execution.execution_id);
+    await rustExecutionSetPerfect(execution.execution_id);
     await dispatch(fetchExecutionsThunk());
     setLoading(false);
     setEditionMode(false);
@@ -38,7 +38,18 @@ export function MissionItem(execution: Props) {
       setLoading(false);
       setEditionMode(false);
     };
-  }
+  };
+
+  const onClickCommitLocalFiles = async () => {
+    setLoading(true);
+    await rustPromptSubmitReview(
+      execution.mission_data.project_dir,
+      execution.execution_id,
+    );
+    await dispatch(fetchExecutionsThunk());
+    setLoading(false);
+    setEditionMode(false);
+  };
 
   let editModeIconButton;
   if (!loading && execution.execution_status !== MissionExecutionStatus.Fail) {
@@ -55,7 +66,9 @@ export function MissionItem(execution: Props) {
   const canSetFail = !loading && editionMode && (execution.execution_status === MissionExecutionStatus.Perfect
     || execution.execution_status === MissionExecutionStatus.Approved
     || execution.execution_status === MissionExecutionStatus.Created);
-  const canConfirm = !loading && editionMode && (execution.execution_status === MissionExecutionStatus.Approved);
+  const canSetPerfect = !loading && editionMode && (execution.execution_status === MissionExecutionStatus.Approved);
+  const canCommitLocalFiles = !loading && editionMode && (execution.execution_status === MissionExecutionStatus.Created
+    || execution.execution_status === MissionExecutionStatus.Approved);
   const setFailButton = !loading && canSetFail && (
     <CustomButton
       label="set fail"
@@ -64,10 +77,18 @@ export function MissionItem(execution: Props) {
       color="text-error"
     />
   );
-  const confirmButton = canConfirm && (
+  const setPerfectButton = canSetPerfect && (
     <CustomButton
-      label="confirm"
-      onClick={onClickConfirm}
+      label="set perfect"
+      onClick={onClickSetPerfect}
+      size="small"
+      color="text-success"
+    />
+  );
+  const commitLocalFiles = canCommitLocalFiles && (
+    <CustomButton
+      label="commit local files"
+      onClick={onClickCommitLocalFiles}
       size="small"
       color="text-success"
     />
@@ -83,7 +104,8 @@ export function MissionItem(execution: Props) {
       <div className="text-xs text-slate-500">
         {execution.execution_status} ({execution.execution_id})
         {setFailButton}
-        {confirmButton}
+        {setPerfectButton}
+        {commitLocalFiles}
       </div>
       <MissionActions execution={execution} onClickDelete={onClickDeleteFile} />
     </div>

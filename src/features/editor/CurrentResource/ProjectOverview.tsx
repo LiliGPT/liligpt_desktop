@@ -1,11 +1,11 @@
 import { notification } from "@tauri-apps/api";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks"
-import { Button } from "@mui/material";
 import { TestingStatus } from "./TestingStatus";
 import { LocalServerBlock } from "../LocalServerBlock";
 import { installDependenciesThunk, selectCurrentProject } from "../../../redux/slices/projectsSlice";
 import { useState } from "react";
 import { MissionDialog } from "../MissionDialog/MissionDialog";
+import { CustomButton } from "../../buttons/CustomButton";
 
 export function ProjectOverview() {
   const currentProject = useAppSelector(selectCurrentProject())!;
@@ -25,7 +25,14 @@ export function ProjectOverview() {
 
   // header will be horizontal with title <h1/> and a clickable config icon in the right
   const header = (
-    <div>
+    <div className="relative">
+      {isValidLanguage && isValidFramework && <CustomButton
+        label="New Mission"
+        onClick={onClickOpenMissionButton}
+        size="medium"
+        color="normal"
+        className="absolute right-0 -top-1"
+      />}
       <h1>{currentProject.displayName}</h1>
     </div>
   );
@@ -48,7 +55,12 @@ export function ProjectOverview() {
     );
   } else if (isValidFramework && !currentProject.dependencies.isInstalled) {
     dependencyAction = (
-      <Button variant="text" color="primary" onClick={onClickInstallDependencies}>Instalar</Button>
+      <CustomButton
+        label="Install"
+        onClick={onClickInstallDependencies}
+        size="small"
+        color="normal"
+      />
     );
   }
 
@@ -69,13 +81,6 @@ export function ProjectOverview() {
       {isValidLanguage && <LocalServerBlock />}
 
       {isValidFramework && <TestingStatus />}
-
-      {isValidLanguage && isValidFramework && <button
-        className="px-2 py-1 text-sm bg-slate-300 hover:bg-indigo-200 rounded"
-        onClick={onClickOpenMissionButton}
-      >
-        New mission
-      </button>}
 
       <MissionDialog open={openMissionDialog} onClose={() => setOpenMissionDialog(false)} />
 

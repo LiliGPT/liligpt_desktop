@@ -15,15 +15,17 @@ export function ResourceSidebar() {
     dispatch(openSubprojectThunk(project!.projectUid, subproject.path));
   };
 
-  if (!project || !subprojects.length) {
+  // return <pre className="text-xs whitespace-break-spaces">{JSON.stringify(project, null, 2)}</pre>;
+
+  if (!subprojects.length) {
     return <></>;
   }
 
-  if (project) {
-    return <>
-      {/*<FileSystemTree />*/}
-    </>;
-  }
+  // if (project) {
+  //   return <>
+  //     {/*<FileSystemTree />*/}
+  //   </>;
+  // }
 
   return (
     <div className="p-2 h-screen">

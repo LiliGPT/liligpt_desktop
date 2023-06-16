@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { MissionInput } from "./MissionInput";
 import { useAppSelector } from "../../../redux/hooks";
 import { ReduxProject, selectCurrentProject } from "../../../redux/slices/projectsSlice";
-import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview } from "../../../services/rust";
+import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview, rustCreateMission, rustExecutionDelete } from "../../../services/rust";
 import { MissionActions } from "../../missions/MissionActions";
+import { MissionExecution } from "../../../services/rust/rust";
 
 interface Props {
   open: boolean;
@@ -13,10 +14,8 @@ interface Props {
 
 interface MissionState {
   loading: boolean;
-  prompt?: PreparedPromptFromRust;
+  prompt?: MissionExecution;
   promptError?: Error;
-  response?: PromptResponseFromRust;
-  responseError?: Error;
   resultMessage?: string;
 }
 
@@ -28,8 +27,6 @@ export function MissionDialog({ open, onClose }: Props) {
     loading: false,
     prompt: undefined,
     promptError: undefined,
-    response: undefined,
-    responseError: undefined,
     resultMessage: undefined,
   });
 
@@ -38,51 +35,30 @@ export function MissionDialog({ open, onClose }: Props) {
       loading: false,
       prompt: undefined,
       promptError: undefined,
-      response: undefined,
-      responseError: undefined,
       resultMessage: undefined,
     };
     setMission(newMission);
   };
 
   const onSubmitMission = async () => {
-    if (mission.response?.mission_id) {
+    if (mission.prompt?.execution_id) {
       await onClickDeletePromptButton();
     }
     setMission({
       loading: true,
       prompt: undefined,
       promptError: undefined,
-      response: undefined,
-      responseError: undefined,
       resultMessage: undefined,
     });
-    let prompt: PreparedPromptFromRust | undefined;
+    let prompt: MissionExecution | undefined;
     try {
-      prompt = await rustPromptPrepare(project.projectDir, message);
+      prompt = await rustCreateMission(project.projectDir, message);
     } catch (e) {
       console.error(e);
       setMission({
         loading: false,
         prompt: undefined,
         promptError: e as Error,
-        response: undefined,
-        responseError: undefined,
-        resultMessage: undefined,
-      });
-      return;
-    }
-    let response: PromptResponseFromRust | undefined;
-    try {
-      response = await rustPromptCreate(project.projectDir, prompt);
-    } catch (e) {
-      console.error(e);
-      setMission({
-        loading: false,
-        prompt: undefined,
-        promptError: undefined,
-        response: undefined,
-        responseError: e as Error,
         resultMessage: undefined,
       });
       return;
@@ -91,8 +67,6 @@ export function MissionDialog({ open, onClose }: Props) {
       loading: false,
       prompt,
       promptError: undefined,
-      response,
-      responseError: undefined,
       resultMessage: undefined,
     });
   };
@@ -102,7 +76,7 @@ export function MissionDialog({ open, onClose }: Props) {
       ...mission,
       loading: true,
     });
-    await rustPromptDelete(mission.response!.mission_id);
+    await rustExecutionDelete(mission.prompt!.execution_id);
     resetMission();
   };
 
@@ -111,7 +85,7 @@ export function MissionDialog({ open, onClose }: Props) {
       ...mission,
       loading: true,
     });
-    await rustPromptApproveAndRun(project.projectDir, mission.response!.mission_id);
+    await rustPromptApproveAndRun(project.projectDir, mission.prompt!.execution_id);
     setMission({
       ...mission,
       loading: false,
@@ -132,20 +106,20 @@ export function MissionDialog({ open, onClose }: Props) {
   // - antes de abrir o modal de missões eu podia exigir que tenha um repo git e que ele esteja sem alterações no git status + um botão de retry
   // - o botão de "reverter" poderia reverter as alterações do git
   const onClickSendReviewMission = async () => {
-    await rustPromptSubmitReview(project.projectDir, mission.response!.mission_id);
+    await rustPromptSubmitReview(project.projectDir, mission.prompt!.execution_id);
     resetMission();
   };
 
   let content;
 
-  if (mission.response) {
+  if (mission.prompt) {
     // success response
     content = (
       <div className="text-xs">
         <div
           className="mb-2"
-        >action plan: ({mission.response.mission_id})</div>
-        <MissionActions execution={mission.response} />
+        >action plan: ({mission.prompt.execution_id})</div>
+        <MissionActions execution={mission.prompt} />
         {!mission.loading && !mission.resultMessage && (
           <div className="mb-6 py-2">
             <button
@@ -167,11 +141,11 @@ export function MissionDialog({ open, onClose }: Props) {
         <pre>{JSON.stringify(mission.promptError, null, 2)}</pre>
       </div>
     );
-  } else if (mission.responseError) {
+  } else if (mission.promptError) {
     content = (
       <div className="text-xs">
         response error:
-        <pre>{JSON.stringify(mission.responseError, null, 2)}</pre>
+        <pre>{JSON.stringify(mission.promptError, null, 2)}</pre>
       </div>
     );
   } else if (mission.prompt) {

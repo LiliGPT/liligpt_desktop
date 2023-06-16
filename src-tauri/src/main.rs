@@ -5,8 +5,10 @@
 mod code_analyst;
 mod code_missions_api;
 mod database;
+mod git_repo;
 mod io;
 mod prompter;
+mod shell;
 mod tauri_commands;
 mod utils;
 
@@ -29,12 +31,11 @@ fn main() {
             // tauri_commands::rust_prompt_create::rust_prompt_create,
             // tauri_commands::rust_prompt_delete::rust_prompt_delete,
             // tauri_commands::rust_prompt_set_ok::rust_prompt_set_ok,
-            // tauri_commands::rust_prompt_approve_and_run::rust_prompt_approve_and_run,
-            // tauri_commands::rust_prompt_submit_review::rust_prompt_submit_review,
+            tauri_commands::rust_prompt_approve_and_run::rust_prompt_approve_and_run,
+            tauri_commands::rust_prompt_submit_review::rust_prompt_submit_review,
             tauri_commands::fetch_missions::fetch_missions,
             tauri_commands::rust_prompt_replace_actions::rust_prompt_replace_actions,
             tauri_commands::create_mission::create_mission_command,
-            tauri_commands::execute_mission::execute_mission_command,
             tauri_commands::search_executions::search_executions_command,
             tauri_commands::review_actions::review_actions_command,
             tauri_commands::set_approved::set_approved_command,

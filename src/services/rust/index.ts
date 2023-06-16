@@ -1,5 +1,6 @@
 import { InvokeArgs, invoke } from "@tauri-apps/api/tauri";
-import { CodeMission, MissionAction, MissionExecution, SearchExecutionsRequest } from "./rust";
+import { CodeMission, MissionAction, MissionData, MissionExecution, SearchExecutionsRequest } from "./rust";
+import { ReduxProject } from "../../redux/slices/projectsSlice";
 
 export interface SubprojectFromRust {
   name: string;
@@ -129,6 +130,7 @@ interface PromptAction {
   path: string;
 }
 
+//deleteme
 export async function rustPromptPrepare(projectDir: string, message: string): Promise<PreparedPromptFromRust> {
   return new Promise((resolve, reject) => {
     const request = { path: projectDir, message };
@@ -220,20 +222,22 @@ export async function rustFetchMissions(): Promise<CodeMission[]> {
   });
 }
 
-export async function rustReplaceMissionActions(promptId: string, actions: MissionAction[]): Promise<void> {
+// --- Missions
+
+export async function rustCreateMission(projectDir: string, message: string): Promise<MissionExecution> {
   return new Promise((resolve, reject) => {
-    const request = { promptId, actions };
-    invoke("rust_prompt_replace_actions", request).then(response => {
-      console.log(`[rustReplaceMissionActions]`, { request, response });
-      resolve();
+    const request = { projectDir, message };
+    invoke("create_mission_command", request).then(response => {
+      console.log(`[rustCreateMission]`, { request, response });
+      resolve(response as MissionExecution);
     }).catch(error => {
-      console.log(`[rustReplaceMissionActions]`, { request, error });
+      console.log(`[rustCreateMission]`, { request, error });
       reject(error);
     });
   });
-}
+};
 
-// --- New commands
+// --- Executions
 
 export async function rustSearchExecutions(request: SearchExecutionsRequest): Promise<MissionExecution[]> {
   return new Promise((resolve, reject) => {
@@ -245,4 +249,43 @@ export async function rustSearchExecutions(request: SearchExecutionsRequest): Pr
       reject(error);
     });
   });
-}
+};
+
+export async function rustExecutionDelete(execution_id: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { execution_id };
+    invoke("set_fail_command", { request }).then(response => {
+      console.log(`[rustExecutionDelete]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustExecutionDelete]`, { request, error });
+      reject(error);
+    });
+  });
+};
+
+export async function rustExecutionSetPerfect(execution_id: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { execution_id };
+    invoke("set_perfect_command", { request }).then(response => {
+      console.log(`[rustExecutionSetPerfect]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustExecutionSetPerfect]`, { request, error });
+      reject(error);
+    });
+  });
+};
+
+export async function rustReplaceExecutionActions(execution_id: string, reviewed_actions: MissionAction[]): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { execution_id, reviewed_actions };
+    invoke("review_actions_command", { request }).then(response => {
+      console.log(`[rustReplaceExecutionActions]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustReplaceExecutionActions]`, { request, error });
+      reject(error);
+    });
+  });
+};

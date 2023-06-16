@@ -1,8 +1,8 @@
-use super::{ExecuteMissionRequest, ExecuteMissionResponse};
+use crate::code_missions_api::MissionExecution;
 
-pub async fn execute_mission(
-    request: ExecuteMissionRequest,
-) -> Result<ExecuteMissionResponse, String> {
+use super::ExecuteMissionRequest;
+
+pub async fn execute_mission(request: ExecuteMissionRequest) -> Result<MissionExecution, String> {
     let http_client = reqwest::Client::new();
     let response = http_client
         .post(&format!("{}/missions/execute", dotenv!("PROMPTER_URL")))

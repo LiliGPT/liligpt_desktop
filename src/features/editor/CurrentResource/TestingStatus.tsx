@@ -1,4 +1,3 @@
-import ConfigIcon from '@mui/icons-material/Settings';
 import { CircularProgress, SvgIcon } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { ReduxTest, runTestThunk, selectTestsFromProject } from '../../../redux/slices/testsSlice';
@@ -67,12 +66,7 @@ export function TestingStatus() {
   )
 
   return (
-    <div className="relative bg-gray-200 text-gray-900 text-sm p-2 pl-3 pb-3 rounded-md mb-3">
-      <div className="absolute right-2 top-1.5">
-        <span onClick={() => { }}>
-          <SvgIcon component={ConfigIcon} fontSize='small' />
-        </span>
-      </div>
+    <div className="relative bg-slate-200 border-slate-300 border text-gray-900 text-sm p-2 pl-3 pb-3 rounded-md mb-3">
       <h2>Testing Status</h2>
 
       {content}

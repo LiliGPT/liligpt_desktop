@@ -1,5 +1,5 @@
 import { Dispatch, PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { rustFetchMissions, rustReplaceMissionActions, rustSearchExecutions } from "../../services/rust";
+import { rustFetchMissions, rustReplaceExecutionActions, rustSearchExecutions } from "../../services/rust";
 import { RootState } from "../store";
 import { MissionAction, MissionExecution } from "../../services/rust/rust";
 
@@ -57,13 +57,17 @@ export const selectExecutions = (state: RootState): MissionExecution[] => {
 
 export const fetchExecutionsThunk = () => (dispatch: Dispatch, getState: () => RootState): Promise<void> => {
   return new Promise(async (resolve, reject) => {
-    if (getState().missions.loading) {
-      console.log(`[fetchExecutionsThunk] already loading`);
-      resolve();
-      return;
-    }
+    // if (getState().missions.loading) {
+    //   console.log(`[fetchExecutionsThunk] already loading`);
+    //   resolve();
+    //   return;
+    // }
     await dispatch(missionsSlice.actions.setLoading(true));
-    const request = { filter: {} };
+    const request = {
+      filter: {
+        'execution_status': { '$ne': 'Fail' }
+      }
+    };
     rustSearchExecutions(request).then(async (executions: MissionExecution[]) => {
       console.log(`[fetchExecutionsThunk]`, { request, response: executions });
       await dispatch(missionsSlice.actions.setExecutions(executions));
@@ -86,14 +90,15 @@ export const removeExecutionActionThunk = (executionId: string, action: MissionA
     const executions = selectExecutions(getState());
     const execution = executions.find(execution => execution.execution_id === executionId);
     if (!execution) {
-      console.log(`[removeExecutionActionThunk] mission not found`);
+      console.log(`[removeExecutionActionThunk] execution not found`);
       await dispatch(missionsSlice.actions.setLoading(false));
       resolve();
       return;
     }
     // const actions = mission.actions.filter(a => (a.path !== action.path && a.action_type !== action.action_type)); // BUGGY ??!
-    const actions = execution.original_actions.filter(a => (a.path !== action.path));
-    await rustReplaceMissionActions(execution.mission_id, actions);
+    const newActions = execution.reviewed_actions ?? execution.original_actions;
+    const actions = newActions.filter(a => (a.path !== action.path));
+    await rustReplaceExecutionActions(execution.execution_id, actions);
     await dispatch(missionsSlice.actions.setLoading(false));
     await fetchExecutionsThunk()(dispatch, getState);
     resolve();

@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
-import { ReduxMissionAction } from "../../redux/slices/missionsSlice";
+import { MissionAction } from "../../services/rust/rust";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  action: ReduxMissionAction | null;
+  action: MissionAction | null;
 }
 
 export function MissionActionDialog(props: Props) {

@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { SvgIcon } from '@mui/material';
 import { closeProjectThunk, openProjectThunk, selectCurrentProject, selectProjects, selectRootProjects, setOpenedProjectUid } from '../../redux/slices/projectsSlice';
+import { CustomButton } from '../buttons/CustomButton';
 
 const EditorTabs: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -43,9 +44,16 @@ const EditorTabs: React.FC = () => {
         })}
       </div>
       <div className="w-1/12 text-right pr-2">
-        <span className="text-blue-400" onClick={onClickOpenProject}>
+        {/*<span className="px-2 py-1 text-white bg-slate-400 hover:bg-slate-200 hover:text-gray-500 text-xs rounded-md cursor-pointer font-bold" onClick={onClickOpenProject}>
           open
-        </span>
+      </span>*/}
+        <CustomButton
+          className="absolute right-1 top-1"
+          label="open"
+          onClick={onClickOpenProject}
+          size="small"
+          color="normal"
+        />
       </div>
     </div>
   );

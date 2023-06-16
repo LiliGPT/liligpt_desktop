@@ -1,7 +1,7 @@
 import { Delete } from "@mui/icons-material";
-import { ReduxMissionAction } from "../../redux/slices/missionsSlice";
+import { MissionAction } from "../../services/rust/rust";
 
-interface Props extends ReduxMissionAction {
+interface Props extends MissionAction {
   onClick: () => void;
   onClickDelete?: () => void;
 }

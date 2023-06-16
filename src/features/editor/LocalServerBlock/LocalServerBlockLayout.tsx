@@ -1,4 +1,3 @@
-import ConfigIcon from '@mui/icons-material/Settings';
 import PlayIcon from '@mui/icons-material/PlayArrow';
 import DebugIcon from '@mui/icons-material/PlayCircle';
 import StopIcon from '@mui/icons-material/Stop';
@@ -32,12 +31,7 @@ export function LocalServerBlockLayout({ projectUid, commands }: Props) {
   };
 
   return (
-    <div className="relative bg-gray-200 text-gray-900 text-sm p-2 pl-3 pb-3 rounded-md mb-3">
-      <div className="absolute right-2 top-1.5">
-        <span onClick={() => { }}>
-          <ConfigIcon fontSize='small' />
-        </span>
-      </div>
+    <div className="bg-slate-200 text-gray-900 border-slate-300 border text-sm p-2 pl-3 pb-3 rounded-md mb-3">
       <h2>Local Server</h2>
 
       {commands.map((command: string) => {
@@ -50,18 +44,18 @@ export function LocalServerBlockLayout({ projectUid, commands }: Props) {
         );
         const playButton = !commandIsRunning && (
           <span onClick={() => startLocalServer(command)}>
-            <PlayIcon />
+            <PlayIcon fontSize="small" />
           </span>
         );
         const stopButton = commandIsRunning && !!(task?.pid || 0 > 0) && (
           <span onClick={() => stopLocalServer(command)}>
-            <StopIcon />
+            <StopIcon fontSize="small" />
           </span>
         );
         return (
-          <div className="py-2" key={command}>
+          <div className="p-0.5" key={command}>
             {statusMarker}
-            <span className="font-semibold">{command}</span>
+            <span>{command}</span>
             {playButton} {stopButton}
           </div>
         );

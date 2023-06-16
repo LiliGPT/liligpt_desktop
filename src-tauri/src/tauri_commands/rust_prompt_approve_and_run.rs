@@ -1,5 +1,5 @@
-use super::super::code_analyst;
-use super::super::prompter;
+use crate::code_missions_api::find_one_execution;
+use crate::code_missions_api::MissionActionType;
 
 #[tauri::command]
 pub async fn rust_prompt_approve_and_run(
@@ -15,7 +15,7 @@ async fn approve_prompt(prompt_id: &str) -> Result<(), String> {
     let http_client = reqwest::Client::new();
     let response = http_client
         .post(&format!(
-            "{}/prompt/{}/approve",
+            "{}/executions/{}/approve",
             dotenv!("PROMPTER_URL"),
             prompt_id
         ))
@@ -28,30 +28,33 @@ async fn approve_prompt(prompt_id: &str) -> Result<(), String> {
 }
 
 async fn run_prompt(path: &str, prompt_id: &str) -> Result<(), String> {
-    let prompt = prompter::PrompterResponse::find_by_prompt_id(prompt_id).await?;
-    for action in prompt.actions {
+    let execution = find_one_execution(prompt_id).await?;
+    let actions = match &execution.reviewed_actions {
+        Some(actions) => actions,
+        None => &execution.original_actions,
+    };
+    for action in actions {
         match action.action_type {
-            prompter::PrompterResponseActionType::CreateFile => {
+            MissionActionType::CreateFile => {
                 let file_path = format!("{}/{}", path, action.path);
                 let file_path = std::path::Path::new(&file_path);
                 // create directory with mkdir -p
                 let parent = file_path.parent().unwrap();
                 let _mkdir = std::fs::create_dir_all(parent).ok();
                 // create file with content
-                std::fs::write(file_path, action.content).ok()
+                std::fs::write(file_path, &action.content).ok()
             }
-            prompter::PrompterResponseActionType::UpdateFile => {
+            MissionActionType::UpdateFile => {
                 let file_path = format!("{}/{}", path, action.path);
                 let file_path = std::path::Path::new(&file_path);
                 // overwrite file with content
-                std::fs::write(file_path, action.content).ok()
-            }
-            prompter::PrompterResponseActionType::DeleteFile => {
-                let file_path = format!("{}/{}", path, action.path);
-                let file_path = std::path::Path::new(&file_path);
-                // delete file
-                std::fs::remove_file(file_path).ok()
-            }
+                std::fs::write(file_path, &action.content).ok()
+            } // MissionActionType::DeleteFile => {
+              //     let file_path = format!("{}/{}", path, action.path);
+              //     let file_path = std::path::Path::new(&file_path);
+              //     // delete file
+              //     std::fs::remove_file(file_path).ok()
+              // }
         };
     }
     Ok(())

@@ -1,5 +1,7 @@
-pub mod tree;
+mod json_file;
+mod local_path;
+mod relative_file_searcher;
 
-// pub fn read_file(file_path: &str) -> Result<String, Box<dyn std::error::Error>> {
-//     Ok(std::fs::read_to_string(file_path)?)
-// }
+pub use json_file::JsonFile;
+pub use local_path::LocalPath;
+pub use relative_file_searcher::RelativeFileSearcher;

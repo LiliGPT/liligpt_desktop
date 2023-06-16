@@ -1,5 +1,4 @@
 pub mod create_mission;
-pub mod execute_mission;
 pub mod fetch_missions;
 pub mod get_file_tree;
 pub mod get_test_scripts;
