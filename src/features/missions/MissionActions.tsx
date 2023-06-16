@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { MissionActionItem } from "./MissionActionItem";
 import { MissionActionDialog } from "./MissionActionDialog";
-import { MissionAction, MissionExecution } from "../../services/rust/rust";
+import { MissionAction, MissionExecution, MissionExecutionContextFile } from "../../services/rust/rust";
 
 interface Props {
   execution: MissionExecution;
+  contextFiles: MissionExecutionContextFile[];
   onClickDelete?: ((action: MissionAction) => Promise<void>);
 }
 
@@ -33,6 +34,7 @@ export function MissionActions(props: Props) {
         open={action !== null}
         onClose={() => setAction(null)}
         action={action}
+        contextFiles={props.contextFiles}
       />
     </>
   );

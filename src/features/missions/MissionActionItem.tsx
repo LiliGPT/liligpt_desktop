@@ -1,5 +1,5 @@
 import { Delete } from "@mui/icons-material";
-import { MissionAction } from "../../services/rust/rust";
+import { MissionAction, MissionExecutionContextFile } from "../../services/rust/rust";
 
 interface Props extends MissionAction {
   onClick: () => void;
@@ -20,6 +20,7 @@ export function MissionActionItem(props: Props) {
       <div onClick={props.onClick} className="rounded py-1 px-2 bg-slate-100 text-xs cursor-pointer">
         {props.action_type} - {props.path}
       </div>
+      <div className="clear-both"></div>
     </div>
   )
 }

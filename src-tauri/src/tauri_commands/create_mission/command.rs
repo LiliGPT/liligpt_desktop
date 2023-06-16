@@ -1,6 +1,10 @@
 use std::path::Path;
 
 use crate::{
+    code_analyst::{
+        frameworks::detect_framework_from_path, languages::detect_code_language_from_path,
+        project_files::get_project_files,
+    },
     code_missions_api::{
         create_mission, CreateMissionRequest, ExecuteMissionRequest, MissionData,
         MissionExecutionContextFile,
@@ -13,15 +17,11 @@ pub async fn create_mission_command(
     project_dir: String,
     message: String,
 ) -> Result<impl serde::Serialize, String> {
-    let code_language =
-        crate::code_analyst::languages::detect_code_language_from_path(&project_dir)?;
-    let framework =
-        crate::code_analyst::frameworks::detect_framework_from_path(&project_dir, &code_language);
-    let project_files = crate::code_analyst::project_files::get_project_files(
-        LocalPath(project_dir.clone()),
-        &code_language,
-        &framework,
-    );
+    let code_language = detect_code_language_from_path(&project_dir)?;
+    let framework = detect_framework_from_path(&project_dir, &code_language);
+    let project_files =
+        get_project_files(LocalPath(project_dir.clone()), &code_language, &framework);
+    // --- Build and create mission
     let request = CreateMissionRequest {
         mission_data: MissionData {
             project_dir: project_dir.clone(),
@@ -32,6 +32,7 @@ pub async fn create_mission_command(
         },
     };
     let mission_response = create_mission(request).await?;
+    // --- Build and create execution
     let mission_data = MissionData {
         project_dir: project_dir.clone(),
         message,

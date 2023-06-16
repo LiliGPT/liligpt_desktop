@@ -2,7 +2,7 @@ interface Props {
   label: string;
   onClick: () => void;
   size: 'small' | 'medium' | 'large';
-  color: 'error' | 'success' | 'text-error' | 'text-success' | 'normal';
+  color: 'error' | 'success' | 'text-error' | 'text-success' | 'normal' | 'highlight';
   className?: string;
 }
 
@@ -24,6 +24,8 @@ export function CustomButton(props: Props) {
     className += ' text-green-600 border-none bg-opacity-20 hover:bg-green-500 hover:text-green-900 hover:bg-opacity-40';
   } else if (color === 'normal') {
     className += ' text-slate-600 border-slate-300 bg-slate-200 hover:bg-slate-300 hover:text-slate-800 hover:border-slate-400';
+  } else if (color === 'highlight') {
+    className += ' text-slate-800 border-slate-400 bg-slate-300 hover:bg-slate-300 hover:text-slate-900 hover:border-slate-400';
   }
   if (props.className) className += ` ${props.className}`;
   return (

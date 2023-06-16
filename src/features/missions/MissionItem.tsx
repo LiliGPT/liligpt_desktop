@@ -48,7 +48,7 @@ export function MissionItem(execution: Props) {
     );
     await dispatch(fetchExecutionsThunk());
     setLoading(false);
-    setEditionMode(false);
+    setEditionMode(true);
   };
 
   let editModeIconButton;
@@ -107,7 +107,13 @@ export function MissionItem(execution: Props) {
         {setPerfectButton}
         {commitLocalFiles}
       </div>
-      <MissionActions execution={execution} onClickDelete={onClickDeleteFile} />
+      <MissionActions
+        execution={execution}
+        onClickDelete={onClickDeleteFile}
+        // original files (not editable)
+        // they are here to display differences between original files and new files
+        contextFiles={execution.context_files}
+      />
     </div>
   );
 }
