@@ -11,7 +11,7 @@ interface ReduxCoreState {
 
 const initialState: ReduxCoreState = {
   // initial app page
-  view: ReduxCoreView.CodeProjects,
+  view: ReduxCoreView.MissionsHistory,
 };
 
 // --- slice

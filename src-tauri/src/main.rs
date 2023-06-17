@@ -41,6 +41,8 @@ fn main() {
             tauri_commands::set_approved::set_approved_command,
             tauri_commands::set_fail::set_fail_command,
             tauri_commands::set_perfect::set_perfect_command,
+            tauri_commands::add_context_files::add_context_files_command,
+            tauri_commands::retry_execution::retry_execution_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

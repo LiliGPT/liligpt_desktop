@@ -5,7 +5,6 @@ import { MissionAction, MissionExecution, MissionExecutionContextFile } from "..
 
 interface Props {
   execution: MissionExecution;
-  contextFiles: MissionExecutionContextFile[];
   onClickDelete?: ((action: MissionAction) => Promise<void>);
 }
 
@@ -34,7 +33,7 @@ export function MissionActions(props: Props) {
         open={action !== null}
         onClose={() => setAction(null)}
         action={action}
-        contextFiles={props.contextFiles}
+        contextFiles={execution.context_files}
       />
     </>
   );

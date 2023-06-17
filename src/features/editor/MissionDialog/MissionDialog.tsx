@@ -1,11 +1,14 @@
 import { Dialog, DialogActions, DialogTitle } from "@mui/material";
 import { useEffect, useState } from "react";
 import { MissionInput } from "./MissionInput";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { ReduxProject, selectCurrentProject } from "../../../redux/slices/projectsSlice";
 import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview, rustCreateMission, rustExecutionDelete } from "../../../services/rust";
 import { MissionActions } from "../../missions/MissionActions";
 import { MissionExecution } from "../../../services/rust/rust";
+import { MissionContextFiles } from "../../missions/MissionContextFiles";
+import { fetchExecutionsThunk, selectExecutions } from "../../../redux/slices/missionsSlice";
+import { useSelector } from "react-redux";
 
 interface Props {
   open: boolean;
@@ -20,6 +23,7 @@ interface MissionState {
 }
 
 export function MissionDialog({ open, onClose }: Props) {
+  const dispatch = useAppDispatch();
   const project: ReduxProject = useAppSelector(selectCurrentProject())!;
   // const [message, setMessage] = useState<string>("create an endpoint with a list of mocked books, remember to create the controller, model and service. Also update src/main.ts");
   const [message, setMessage] = useState<string>("");
@@ -53,6 +57,7 @@ export function MissionDialog({ open, onClose }: Props) {
     let prompt: MissionExecution | undefined;
     try {
       prompt = await rustCreateMission(project.projectDir, message);
+      await dispatch(fetchExecutionsThunk());
     } catch (e) {
       console.error(e);
       setMission({
@@ -70,6 +75,8 @@ export function MissionDialog({ open, onClose }: Props) {
       resultMessage: undefined,
     });
   };
+
+  const execution = useSelector(selectExecutions).find(e => e.execution_id === mission.prompt?.execution_id);
 
   const onClickDeletePromptButton = async () => {
     setMission({
@@ -112,14 +119,15 @@ export function MissionDialog({ open, onClose }: Props) {
 
   let content;
 
-  if (mission.prompt) {
+  if (mission.prompt && execution) {
     // success response
     content = (
       <div className="text-xs">
         <div
           className="mb-2"
-        >action plan: ({mission.prompt.execution_id})</div>
-        <MissionActions execution={mission.prompt} />
+        >action plan: ({execution.execution_id})</div>
+        <MissionActions execution={execution} />
+        <MissionContextFiles execution={execution} />
         {!mission.loading && !mission.resultMessage && (
           <div className="mb-6 py-2">
             <button

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { fetchExecutionsThunk, removeExecutionActionThunk } from "../../redux/slices/missionsSlice";
 import { MissionActions } from "./MissionActions";
-import { Close, Edit } from "@mui/icons-material";
+import { Close, Edit, Settings } from "@mui/icons-material";
 import { CustomButton } from "../buttons/CustomButton";
-import { rustExecutionDelete, rustExecutionSetPerfect, rustPromptSubmitReview } from "../../services/rust";
+import { rustExecutionDelete, rustExecutionSetPerfect, rustPromptApproveAndRun, rustPromptSubmitReview, rustRetryExecution } from "../../services/rust";
 import { useAppDispatch } from "../../redux/hooks";
 import { MissionAction, MissionExecution, MissionExecutionStatus } from "../../services/rust/rust";
+import { SettingsDropdownButton } from "../../components/SettingsDropdownMenu";
+import { MissionContextFiles } from "./MissionContextFiles";
 
 interface Props extends MissionExecution { }
 
@@ -40,6 +42,26 @@ export function MissionItem(execution: Props) {
     };
   };
 
+  const onClickRetryMission = async () => {
+    setLoading(true);
+    await rustRetryExecution(execution.execution_id);
+    await dispatch(fetchExecutionsThunk());
+    // TODO: should we run the new actions locally?
+    setLoading(false);
+    setEditionMode(false);
+  };
+
+  const onClickApproveAndRun = async () => {
+    setLoading(true);
+    await rustPromptApproveAndRun(
+      execution.mission_data.project_dir,
+      execution.execution_id,
+    );
+    await dispatch(fetchExecutionsThunk());
+    setLoading(false);
+    setEditionMode(true);
+  };
+
   const onClickCommitLocalFiles = async () => {
     setLoading(true);
     await rustPromptSubmitReview(
@@ -67,7 +89,7 @@ export function MissionItem(execution: Props) {
     || execution.execution_status === MissionExecutionStatus.Approved
     || execution.execution_status === MissionExecutionStatus.Created);
   const canSetPerfect = !loading && editionMode && (execution.execution_status === MissionExecutionStatus.Approved);
-  const canCommitLocalFiles = !loading && editionMode && (execution.execution_status === MissionExecutionStatus.Created
+  const canOpenSettings = !loading && editionMode && (execution.execution_status === MissionExecutionStatus.Created
     || execution.execution_status === MissionExecutionStatus.Approved);
   const setFailButton = !loading && canSetFail && (
     <CustomButton
@@ -85,34 +107,45 @@ export function MissionItem(execution: Props) {
       color="text-success"
     />
   );
-  const commitLocalFiles = canCommitLocalFiles && (
-    <CustomButton
-      label="commit local files"
-      onClick={onClickCommitLocalFiles}
-      size="small"
-      color="text-success"
+  let settingsActions: { [key: string]: () => void } = {
+    'commit local files': onClickCommitLocalFiles,
+  }
+  if (execution.execution_status === MissionExecutionStatus.Created) {
+    settingsActions = {
+      'retry mission': onClickRetryMission,
+      'approve and run': onClickApproveAndRun,
+      ...settingsActions,
+    };
+  }
+  const settingsDropdownMenu = canOpenSettings && (
+    <SettingsDropdownButton
+      menuOptions={Object.keys(settingsActions)}
+      callbacks={Object.values(settingsActions)}
     />
   );
 
   return (
     <div
-      className="border rounded-md px-2 py-1 my-2 bg-slate-200 border-gray-300 text-xs"
+      className="relative border rounded-md px-2 py-1 my-2 bg-slate-200 border-gray-300 text-xs"
       key={execution.execution_id}
     >
       {editModeIconButton}
+      <div className="absolute right-2 top-8">
+        {settingsDropdownMenu}
+      </div>
+      <div className="mb-2 text-xs">{execution.mission_data.project_dir.split('/').pop()}</div>
       <div className="text-sm">{execution.mission_data.message}</div>
       <div className="text-xs text-slate-500">
         {execution.execution_status} ({execution.execution_id})
         {setFailButton}
         {setPerfectButton}
-        {commitLocalFiles}
       </div>
       <MissionActions
         execution={execution}
         onClickDelete={onClickDeleteFile}
-        // original files (not editable)
-        // they are here to display differences between original files and new files
-        contextFiles={execution.context_files}
+      />
+      <MissionContextFiles
+        execution={execution}
       />
     </div>
   );

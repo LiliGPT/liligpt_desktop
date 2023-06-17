@@ -289,3 +289,29 @@ export async function rustReplaceExecutionActions(execution_id: string, reviewed
     });
   });
 };
+
+export async function rustAddContextFiles(project_dir: string, execution_id: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { project_dir, execution_id };
+    invoke("add_context_files_command", { request }).then(response => {
+      console.log(`[rustAddContextFiles]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustAddContextFiles]`, { request, error });
+      reject(error);
+    });
+  });
+}
+
+export async function rustRetryExecution(execution_id: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = { execution_id };
+    invoke("retry_execution_command", { request }).then(response => {
+      console.log(`[rustRetryExecution]`, { request, response });
+      resolve();
+    }).catch(error => {
+      console.log(`[rustRetryExecution]`, { request, error });
+      reject(error);
+    });
+  });
+}
