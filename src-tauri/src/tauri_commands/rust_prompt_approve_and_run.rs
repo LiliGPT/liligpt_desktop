@@ -1,33 +1,37 @@
-use crate::code_missions_api::find_one_execution;
-use crate::code_missions_api::MissionActionType;
+use crate::code_missions_api::{find_one_execution, set_approved};
+use crate::code_missions_api::{ApiError, MissionActionType};
 
 #[tauri::command]
 pub async fn rust_prompt_approve_and_run(
     path: String,
     prompt_id: String,
-) -> Result<impl serde::Serialize, String> {
-    approve_prompt(&prompt_id).await?;
+) -> Result<impl serde::Serialize, ApiError> {
+    // approve_prompt(&prompt_id).await?;
+    let request = crate::code_missions_api::SetApprovedRequest {
+        execution_id: prompt_id.clone(),
+    };
+    set_approved(request).await?;
     run_prompt(&path, &prompt_id).await?;
     Ok(())
 }
 
-async fn approve_prompt(prompt_id: &str) -> Result<(), String> {
-    let http_client = reqwest::Client::new();
-    let response = http_client
-        .post(&format!(
-            "{}/executions/{}/approve",
-            dotenv!("PROMPTER_URL"),
-            prompt_id
-        ))
-        .send()
-        .await;
-    if response.is_err() {
-        return Err("Failed to connect to prompter".to_string());
-    }
-    Ok(())
-}
+// async fn approve_prompt(prompt_id: &str) -> Result<(), String> {
+//     let http_client = reqwest::Client::new();
+//     let response = http_client
+//         .post(&format!(
+//             "{}/executions/{}/approve",
+//             dotenv!("PROMPTER_URL"),
+//             prompt_id
+//         ))
+//         .send()
+//         .await;
+//     if response.is_err() {
+//         return Err("Failed to connect to prompter".to_string());
+//     }
+//     Ok(())
+// }
 
-async fn run_prompt(path: &str, prompt_id: &str) -> Result<(), String> {
+async fn run_prompt(path: &str, prompt_id: &str) -> Result<(), ApiError> {
     let execution = find_one_execution(prompt_id).await?;
     let actions = match &execution.reviewed_actions {
         Some(actions) => actions,

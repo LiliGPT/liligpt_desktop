@@ -6,7 +6,7 @@ use crate::{
         project_files::get_project_files,
     },
     code_missions_api::{
-        create_mission, CreateMissionRequest, ExecuteMissionRequest, MissionData,
+        create_mission, ApiError, CreateMissionRequest, ExecuteMissionRequest, MissionData,
         MissionExecutionContextFile,
     },
     io::LocalPath,
@@ -16,8 +16,11 @@ use crate::{
 pub async fn create_mission_command(
     project_dir: String,
     message: String,
-) -> Result<impl serde::Serialize, String> {
-    let code_language = detect_code_language_from_path(&project_dir)?;
+) -> Result<impl serde::Serialize, ApiError> {
+    let code_language = detect_code_language_from_path(&project_dir).map_err(|err| ApiError {
+        status_code: 400,
+        message: format!("Failed to detect code language: {}", err),
+    })?;
     let framework = detect_framework_from_path(&project_dir, &code_language);
     let project_files =
         get_project_files(LocalPath(project_dir.clone()), &code_language, &framework);

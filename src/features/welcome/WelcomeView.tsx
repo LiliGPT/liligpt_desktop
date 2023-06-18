@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useAppDispatch } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { openProjectThunk } from "../../redux/slices/projectsSlice";
-import { ProjectFromRust, rustPromptSubmitReview } from "../../services/rust";
+import { ProjectFromRust, rustAuthLogin, rustPromptSubmitReview } from "../../services/rust";
 import { invoke } from "@tauri-apps/api";
+import { authLoginThunk, selectCurrentUser } from "../../redux/slices/authSlice";
 
 const ENABLE_INITIAL_DISPATCHER = false;
 
@@ -31,6 +32,7 @@ function _InitialDispatcher() {
 
 export function WelcomeView() {
   const dispatch = useAppDispatch();
+  const user = useAppSelector(selectCurrentUser());
 
   function onClickOpenProject() {
     dispatch(openProjectThunk());

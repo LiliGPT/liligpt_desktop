@@ -8,7 +8,7 @@ use crate::{
         project_files::get_project_files,
     },
     code_missions_api::{
-        add_context_files, create_mission, find_one_execution, AddContextFilesRequest,
+        add_context_files, create_mission, find_one_execution, AddContextFilesRequest, ApiError,
         CreateMissionRequest, ExecuteMissionRequest, MissionData, MissionExecutionContextFile,
         MissionExecutionStatus,
     },
@@ -20,7 +20,7 @@ use super::command_request::CommandRequest;
 #[tauri::command]
 pub async fn add_context_files_command(
     request: CommandRequest,
-) -> Result<impl serde::Serialize, String> {
+) -> Result<impl serde::Serialize, ApiError> {
     let files_to_add = pick_files_to_add(&request)?;
     let context_files: Vec<MissionExecutionContextFile> = files_to_add
         .iter()
@@ -36,7 +36,10 @@ pub async fn add_context_files_command(
         && execution.execution_status != MissionExecutionStatus::Approved
         && execution.execution_status != MissionExecutionStatus::Ok
     {
-        return Err("Execution is not in a state where context files can be added".to_string());
+        return Err(ApiError {
+            message: "Execution is not in a state where context files can be added".to_string(),
+            status_code: 0,
+        });
     }
     let request = AddContextFilesRequest {
         execution_id: request.execution_id,
@@ -46,14 +49,22 @@ pub async fn add_context_files_command(
     Ok(result)
 }
 
-fn pick_files_to_add(request: &CommandRequest) -> Result<Vec<String>, String> {
+fn pick_files_to_add(request: &CommandRequest) -> Result<Vec<String>, ApiError> {
     let picked_files = tauri::api::dialog::blocking::FileDialogBuilder::new().pick_files();
     let picked_files = match picked_files {
         Some(files) => files,
-        None => return Err("No files picked".to_string()),
+        None => {
+            return Err(ApiError {
+                message: "No files picked (1)".to_string(),
+                status_code: 0,
+            })
+        }
     };
     if picked_files.len() == 0 {
-        return Err("No files picked".to_string());
+        return Err(ApiError {
+            message: "No files picked (2)".to_string(),
+            status_code: 0,
+        });
     }
     // println!("Picked files: {:?}", picked_files);
     // let code_language = match detect_code_language_from_path(&request.project_dir) {

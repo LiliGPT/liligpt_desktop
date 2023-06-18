@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { MissionInput } from "./MissionInput";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { ReduxProject, selectCurrentProject } from "../../../redux/slices/projectsSlice";
-import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview, rustCreateMission, rustExecutionDelete } from "../../../services/rust";
+import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview, rustCreateMission, rustExecutionDelete, rustRetryExecution } from "../../../services/rust";
 import { MissionActions } from "../../missions/MissionActions";
 import { MissionExecution } from "../../../services/rust/rust";
 import { MissionContextFiles } from "../../missions/MissionContextFiles";
@@ -46,7 +46,9 @@ export function MissionDialog({ open, onClose }: Props) {
 
   const onSubmitMission = async () => {
     if (mission.prompt?.execution_id) {
-      await onClickDeletePromptButton();
+      // await onClickDeletePromptButton();
+      await onRetryPrompt();
+      return;
     }
     setMission({
       loading: true,
@@ -99,6 +101,31 @@ export function MissionDialog({ open, onClose }: Props) {
       resultMessage: 'Mission complete!',
     });
     setMessage('');
+  };
+
+  const onRetryPrompt = async () => {
+    setMission({
+      ...mission,
+      loading: true,
+    });
+    try {
+      await rustRetryExecution(mission.prompt!.execution_id, message);
+      await dispatch(fetchExecutionsThunk());
+      setMission({
+        ...mission,
+        loading: false,
+      });
+      setMessage('');
+    } catch (e) {
+      console.error(e);
+      setMission({
+        ...mission,
+        loading: false,
+        resultMessage: String(e),
+        promptError: e as Error,
+      });
+      return;
+    }
   };
 
   const onClickSetMissionFailed = async () => {
@@ -207,6 +234,7 @@ export function MissionDialog({ open, onClose }: Props) {
         <MissionInput
           value={message}
           disabled={mission.loading}
+          buttonLabel={mission.prompt ? 'Retry' : 'Ask'}
           onChange={v => setMessage(v)}
           onSubmit={onSubmitMission} />
       </DialogActions>

@@ -11,6 +11,9 @@ interface Props {
 export function MissionContextFiles(props: Props) {
   const dispatch = useAppDispatch();
 
+  const canAddFiles = props.execution.execution_status === MissionExecutionStatus.Created
+    || props.execution.execution_status === MissionExecutionStatus.Approved;
+
   const onClickAdd = async () => {
     await rustAddContextFiles(
       props.execution.mission_data.project_dir,
@@ -21,7 +24,7 @@ export function MissionContextFiles(props: Props) {
 
   return (
     <>
-      {props.execution.execution_status === MissionExecutionStatus.Created && (
+      {canAddFiles && (
         <span className="float-right mt-1 text-slate-300 hover:text-slate-400" onClick={onClickAdd}>
           <AddCircleOutline fontSize="small" />
         </span>

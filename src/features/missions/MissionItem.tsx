@@ -44,7 +44,7 @@ export function MissionItem(execution: Props) {
 
   const onClickRetryMission = async () => {
     setLoading(true);
-    await rustRetryExecution(execution.execution_id);
+    await rustRetryExecution(execution.execution_id, execution.mission_data.message);
     await dispatch(fetchExecutionsThunk());
     // TODO: should we run the new actions locally?
     setLoading(false);

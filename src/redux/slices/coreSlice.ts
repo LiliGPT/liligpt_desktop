@@ -1,18 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// initial state
+
 export enum ReduxCoreView {
   CodeProjects,
   MissionsHistory,
 }
 
+const initialState: ReduxCoreState = {
+  // initial app page
+  view: ReduxCoreView.CodeProjects,
+};
+
 interface ReduxCoreState {
   view: ReduxCoreView;
 }
-
-const initialState: ReduxCoreState = {
-  // initial app page
-  view: ReduxCoreView.MissionsHistory,
-};
 
 // --- slice
 

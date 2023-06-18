@@ -102,3 +102,16 @@ export enum CodeMissionStatus {
   Fail = 'Fail',
   Perfect = 'Perfect',
 }
+
+// --- Login
+
+export interface AuthLoginRequest {
+  username: string;
+  password: string;
+}
+
+// --- Retry
+
+export interface RetryExecutionRequest {
+  message: string;
+}

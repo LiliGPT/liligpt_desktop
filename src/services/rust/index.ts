@@ -1,6 +1,7 @@
 import { InvokeArgs, invoke } from "@tauri-apps/api/tauri";
 import { CodeMission, MissionAction, MissionData, MissionExecution, SearchExecutionsRequest } from "./rust";
 import { ReduxProject } from "../../redux/slices/projectsSlice";
+import { ReduxAuthPayload } from "../../redux/slices/authSlice";
 
 export interface SubprojectFromRust {
   name: string;
@@ -303,14 +304,35 @@ export async function rustAddContextFiles(project_dir: string, execution_id: str
   });
 }
 
-export async function rustRetryExecution(execution_id: string): Promise<void> {
+export async function rustRetryExecution(execution_id: string, message: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const request = { execution_id };
+    const request = { execution_id, message };
     invoke("retry_execution_command", { request }).then(response => {
       console.log(`[rustRetryExecution]`, { request, response });
       resolve();
     }).catch(error => {
       console.log(`[rustRetryExecution]`, { request, error });
+      reject(error);
+    });
+  });
+}
+
+interface AuthLoginResponseFromRust {
+  access_token: string;
+  refresh_token: string;
+}
+
+export async function rustAuthLogin(username: string, password: string): Promise<ReduxAuthPayload> {
+  return new Promise((resolve, reject) => {
+    const request = { username, password };
+    invoke("auth_login_command", { request }).then((response) => {
+      console.log(`[rustAuthLogin]`, { request, response });
+      resolve({
+        accessToken: (response as AuthLoginResponseFromRust).access_token,
+        refreshToken: (response as AuthLoginResponseFromRust).refresh_token,
+      });
+    }).catch(error => {
+      console.log(`[rustAuthLogin]`, { request, error });
       reject(error);
     });
   });

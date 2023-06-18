@@ -2,8 +2,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![allow(unused_must_use)]
 
+mod auth;
 mod code_analyst;
 mod code_missions_api;
+mod configjson;
 mod database;
 mod git_repo;
 mod io;
@@ -43,6 +45,7 @@ fn main() {
             tauri_commands::set_perfect::set_perfect_command,
             tauri_commands::add_context_files::add_context_files_command,
             tauri_commands::retry_execution::retry_execution_command,
+            tauri_commands::auth_login::auth_login_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

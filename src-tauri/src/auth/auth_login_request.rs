@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct CommandRequest {
-    pub execution_id: String,
-    pub message: String,
+pub struct AuthLoginRequest {
+    pub username: String,
+    pub password: String,
 }

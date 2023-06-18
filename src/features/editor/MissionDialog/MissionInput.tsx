@@ -6,11 +6,12 @@ import { selectCurrentProject } from "../../../redux/slices/projectsSlice";
 interface Props {
   onSubmit: () => void;
   value: string;
+  buttonLabel: string;
   onChange: (message: string) => void;
   disabled: boolean;
 }
 
-export function MissionInput({ value, onChange, onSubmit, disabled }: Props) {
+export function MissionInput({ value, onChange, onSubmit, disabled, buttonLabel }: Props) {
   const onClickAskButton = () => {
     onSubmit();
   };
@@ -25,7 +26,7 @@ export function MissionInput({ value, onChange, onSubmit, disabled }: Props) {
           className="px-2 py-1 text-sm bg-slate-300 hover:bg-slate-400 rounded h-full"
           onClick={onClickAskButton}
         >
-          Ask
+          {buttonLabel}
         </button>}
       </div>
     </div>

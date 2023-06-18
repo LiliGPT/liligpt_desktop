@@ -6,11 +6,13 @@ import { shellTasksSlice } from './slices/shellTasksSlice';
 import { shellLogsSlice } from './slices/shellLogsSlice';
 import { coreSlice } from './slices/coreSlice';
 import { missionsSlice } from './slices/missionsSlice';
+import { authSlice } from './slices/authSlice';
 
 export const store = configureStore({
   devTools: true,
   preloadedState: {
     core: coreSlice.getInitialState(),
+    auth: authSlice.getInitialState(),
     projects: projectsSlice.getInitialState(),
     tests: testsSlice.getInitialState(),
     renderTrees: renderTreesSlice.getInitialState(),
@@ -20,6 +22,7 @@ export const store = configureStore({
   },
   reducer: {
     core: coreSlice.reducer,
+    auth: authSlice.reducer,
     projects: projectsSlice.reducer,
     tests: testsSlice.reducer,
     renderTrees: renderTreesSlice.reducer,
