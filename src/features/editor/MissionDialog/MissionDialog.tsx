@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import { MissionInput } from "./MissionInput";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { ReduxProject, selectCurrentProject } from "../../../redux/slices/projectsSlice";
-import { PreparedPromptFromRust, PromptResponseFromRust, rustPromptPrepare, rustPromptCreate, rustPromptApproveAndRun, rustPromptDelete, rustPromptSubmitReview, rustCreateMission, rustExecutionDelete, rustRetryExecution } from "../../../services/rust";
 import { MissionActions } from "../../missions/MissionActions";
 import { MissionExecution } from "../../../services/rust/rust";
 import { MissionContextFiles } from "../../missions/MissionContextFiles";
-import { fetchExecutionsThunk, selectExecutions } from "../../../redux/slices/missionsSlice";
+import { approveAndRunExecutionThunk, commitExecutionLocalChangesThunk, createExecutionThunk, deleteExecutionThunk, retryExecutionThunk, selectExecutions } from "../../../redux/slices/missionsSlice";
 import { useSelector } from "react-redux";
 
 interface Props {
@@ -58,8 +57,7 @@ export function MissionDialog({ open, onClose }: Props) {
     });
     let prompt: MissionExecution | undefined;
     try {
-      prompt = await rustCreateMission(project.projectDir, message);
-      await dispatch(fetchExecutionsThunk());
+      prompt = await dispatch(createExecutionThunk(project.projectDir, message));
     } catch (e) {
       console.error(e);
       setMission({
@@ -85,7 +83,7 @@ export function MissionDialog({ open, onClose }: Props) {
       ...mission,
       loading: true,
     });
-    await rustExecutionDelete(mission.prompt!.execution_id);
+    await dispatch(deleteExecutionThunk(mission.prompt!.execution_id));
     resetMission();
   };
 
@@ -94,7 +92,7 @@ export function MissionDialog({ open, onClose }: Props) {
       ...mission,
       loading: true,
     });
-    await rustPromptApproveAndRun(project.projectDir, mission.prompt!.execution_id);
+    await dispatch(approveAndRunExecutionThunk(project.projectDir, mission.prompt!.execution_id));
     setMission({
       ...mission,
       loading: false,
@@ -103,19 +101,29 @@ export function MissionDialog({ open, onClose }: Props) {
     setMessage('');
   };
 
+  const onClickCommitLocalFiles = async () => {
+    setMission({
+      ...mission,
+      loading: true,
+    });
+    await dispatch(commitExecutionLocalChangesThunk(project.projectDir, mission.prompt!.execution_id));
+    setMission({
+      ...mission,
+      loading: false,
+    });
+  };
+
   const onRetryPrompt = async () => {
     setMission({
       ...mission,
       loading: true,
     });
     try {
-      await rustRetryExecution(mission.prompt!.execution_id, message);
-      await dispatch(fetchExecutionsThunk());
+      await dispatch(retryExecutionThunk(mission.prompt!.execution_id, message));
       setMission({
         ...mission,
         loading: false,
       });
-      setMessage('');
     } catch (e) {
       console.error(e);
       setMission({
@@ -136,14 +144,6 @@ export function MissionDialog({ open, onClose }: Props) {
     resetMission();
   };
 
-  // ideias:
-  // - antes de abrir o modal de missões eu podia exigir que tenha um repo git e que ele esteja sem alterações no git status + um botão de retry
-  // - o botão de "reverter" poderia reverter as alterações do git
-  const onClickSendReviewMission = async () => {
-    await rustPromptSubmitReview(project.projectDir, mission.prompt!.execution_id);
-    resetMission();
-  };
-
   let content;
 
   if (mission.prompt && execution) {
@@ -153,7 +153,7 @@ export function MissionDialog({ open, onClose }: Props) {
         <div
           className="mb-2"
         >action plan: ({execution.execution_id})</div>
-        <MissionActions execution={execution} />
+        <MissionActions execution={execution} canDelete={!mission.resultMessage} />
         <MissionContextFiles execution={execution} />
         {!mission.loading && !mission.resultMessage && (
           <div className="mb-6 py-2">
@@ -164,7 +164,7 @@ export function MissionDialog({ open, onClose }: Props) {
             <button
               onClick={onApprovePrompt}
               className="px-2 py-0.5 mt-0.5 bg-green-100 border-green-200 hover:bg-green-200 hover:border-green-300 border-2 rounded-md ml-1 cursor-pointer"
-            >approve</button>
+            >approve and run</button>
           </div>
         )}
       </div>
@@ -214,30 +214,34 @@ export function MissionDialog({ open, onClose }: Props) {
             </div>
             <div className="text-xs pb-8">
               <button
-                onClick={onClickSetMissionFailed}
-                className="px-2 py-0.5 mt-0.5 bg-red-100 border-red-200 hover:bg-red-200 hover:border-red-300 border-2 rounded-md cursor-pointer"
-              >set failed</button>
-              <button
-                onClick={onClickSendReviewMission}
-                className="px-2 py-0.5 mt-0.5 bg-green-100 border-green-200 hover:bg-green-200 hover:border-green-300 border-2 rounded-md ml-1 cursor-pointer"
+                disabled={mission.loading}
+                onClick={onClickCommitLocalFiles}
+                className="px-2 py-0.5 mt-0.5 bg-blue-100 border-blue-200 hover:bg-blue-200 hover:border-blue-300 border-2 rounded-md cursor-pointer"
               >commit local changes</button>
               <button
+                disabled={mission.loading}
+                onClick={onClickSetMissionFailed}
+                className="ml-1 px-2 py-0.5 mt-0.5 bg-red-100 border-red-200 hover:bg-red-200 hover:border-red-300 border-2 rounded-md cursor-pointer"
+              >set failed</button>
+              <button
+                disabled={mission.loading}
                 onClick={onClickCloseMission}
-                className="px-2 py-0.5 mt-0.5 bg-gray-100 border-gray-200 hover:bg-gray-200 hover:border-gray-300 border-2 rounded-md ml-1 cursor-pointer"
+                className="ml-1 px-2 py-0.5 mt-0.5 bg-gray-100 border-gray-200 hover:bg-gray-200 hover:border-gray-300 border-2 rounded-md cursor-pointer"
               >close mission</button>
-
             </div>
           </>
         )}
       </div>
-      <DialogActions>
-        <MissionInput
-          value={message}
-          disabled={mission.loading}
-          buttonLabel={mission.prompt ? 'Retry' : 'Ask'}
-          onChange={v => setMessage(v)}
-          onSubmit={onSubmitMission} />
-      </DialogActions>
+      {!mission.resultMessage && (
+        <DialogActions>
+          <MissionInput
+            value={message}
+            disabled={mission.loading}
+            buttonLabel={mission.prompt ? 'Retry' : 'Ask'}
+            onChange={v => setMessage(v)}
+            onSubmit={onSubmitMission} />
+        </DialogActions>
+      )}
     </Dialog>
   )
 }

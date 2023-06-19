@@ -1,17 +1,26 @@
 import { Delete } from "@mui/icons-material";
 import { MissionAction, MissionExecutionContextFile } from "../../services/rust/rust";
+import { useAppDispatch } from "../../redux/hooks";
+import { removeExecutionActionThunk } from "../../redux/slices/missionsSlice";
 
 interface Props extends MissionAction {
+  execution_id: string;
   onClick: () => void;
-  onClickDelete?: () => void;
+  canDelete: boolean;
 }
 
 export function MissionActionItem(props: Props) {
+  const dispatch = useAppDispatch();
+
+  const onClickDelete = async () => {
+    await dispatch(removeExecutionActionThunk(props.execution_id, props));
+  };
+
   return (
     <div className="my-0.5">
-      {!!props.onClickDelete && (
+      {!!props.canDelete && (
         <div
-          onClick={props.onClickDelete}
+          onClick={onClickDelete}
           className="float-right text-red-700 hover:bg-red-200 rounded py-0.5 px-1 opacity-70"
         >
           <Delete fontSize="small" />

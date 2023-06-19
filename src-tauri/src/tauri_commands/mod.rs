@@ -1,5 +1,6 @@
 pub mod add_context_files;
 pub mod auth_login;
+pub mod auth_refresh_token;
 pub mod create_mission;
 pub mod fetch_missions;
 pub mod get_file_tree;

@@ -110,6 +110,10 @@ export interface AuthLoginRequest {
   password: string;
 }
 
+export interface AuthRefreshTokenRequest {
+  refresh_token: string;
+}
+
 // --- Retry
 
 export interface RetryExecutionRequest {

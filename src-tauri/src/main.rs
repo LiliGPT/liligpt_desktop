@@ -46,6 +46,7 @@ fn main() {
             tauri_commands::add_context_files::add_context_files_command,
             tauri_commands::retry_execution::retry_execution_command,
             tauri_commands::auth_login::auth_login_command,
+            tauri_commands::auth_refresh_token::auth_refresh_token_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

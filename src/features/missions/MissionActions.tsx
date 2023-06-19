@@ -5,27 +5,23 @@ import { MissionAction, MissionExecution, MissionExecutionContextFile } from "..
 
 interface Props {
   execution: MissionExecution;
-  onClickDelete?: ((action: MissionAction) => Promise<void>);
+  canDelete: boolean;
+  // onClickDelete?: ((action: MissionAction) => Promise<void>);
 }
 
 export function MissionActions(props: Props) {
-  const { execution } = props;
+  const { execution, canDelete } = props;
   const [action, setAction] = useState<MissionAction | null>(null);
   const actions: MissionAction[] = execution.reviewed_actions ?? execution.original_actions ?? [];
-
-  const onClickDelete = (action: MissionAction) => {
-    if (props.onClickDelete) {
-      return () => props.onClickDelete!(action);
-    }
-  };
 
   return (
     <>
       <div className="">
         {actions.map((action, index) => <MissionActionItem
           key={`${execution.mission_id}-act-${index}`}
+          execution_id={execution.execution_id}
           onClick={() => setAction(action)}
-          onClickDelete={onClickDelete(action)}
+          canDelete={canDelete && actions.length > 1}
           {...action}
         />)}
       </div>

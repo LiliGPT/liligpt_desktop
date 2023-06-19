@@ -162,10 +162,10 @@ export async function rustPromptApproveAndRun(projectDir: string, promptId: stri
   return new Promise((resolve, reject) => {
     const request = { path: projectDir, promptId };
     invoke("rust_prompt_approve_and_run", request).then(response => {
-      console.log(`[rustPromptApproveAndRun]`, { request, response });
+      // console.log(`[rustPromptApproveAndRun]`, { request, response });
       resolve();
     }).catch(error => {
-      console.log(`[rustPromptApproveAndRun]`, { request, error });
+      // console.log(`[rustPromptApproveAndRun]`, { request, error });
       reject(error);
     });
   });
@@ -201,10 +201,10 @@ export async function rustPromptSubmitReview(projectDir: string, promptId: strin
   return new Promise((resolve, reject) => {
     const request = { promptId, cwd: projectDir };
     invoke("rust_prompt_submit_review", request).then(response => {
-      console.log(`[rustPromptSubmitReview]`, { request, response });
+      // console.log(`[rustPromptSubmitReview]`, { request, response });
       resolve();
     }).catch(error => {
-      console.log(`[rustPromptSubmitReview]`, { request, error });
+      // console.log(`[rustPromptSubmitReview]`, { request, error });
       reject(error);
     });
   });
@@ -229,10 +229,10 @@ export async function rustCreateMission(projectDir: string, message: string): Pr
   return new Promise((resolve, reject) => {
     const request = { projectDir, message };
     invoke("create_mission_command", request).then(response => {
-      console.log(`[rustCreateMission]`, { request, response });
+      // console.log(`[rustCreateMission]`, { request, response });
       resolve(response as MissionExecution);
     }).catch(error => {
-      console.log(`[rustCreateMission]`, { request, error });
+      // console.log(`[rustCreateMission]`, { request, error });
       reject(error);
     });
   });
@@ -243,10 +243,10 @@ export async function rustCreateMission(projectDir: string, message: string): Pr
 export async function rustSearchExecutions(request: SearchExecutionsRequest): Promise<MissionExecution[]> {
   return new Promise((resolve, reject) => {
     invoke("search_executions_command", { request }).then(response => {
-      console.log(`[rustSearchExecutions]`, { request, response });
+      // console.log(`[rustSearchExecutions]`, { request, response });
       resolve(response as MissionExecution[]);
     }).catch(error => {
-      console.log(`[rustSearchExecutions]`, { request, error });
+      // console.log(`[rustSearchExecutions]`, { request, error });
       reject(error);
     });
   });
@@ -256,10 +256,10 @@ export async function rustExecutionDelete(execution_id: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = { execution_id };
     invoke("set_fail_command", { request }).then(response => {
-      console.log(`[rustExecutionDelete]`, { request, response });
+      // console.log(`[rustExecutionDelete]`, { request, response });
       resolve();
     }).catch(error => {
-      console.log(`[rustExecutionDelete]`, { request, error });
+      // console.log(`[rustExecutionDelete]`, { request, error });
       reject(error);
     });
   });
@@ -282,10 +282,10 @@ export async function rustReplaceExecutionActions(execution_id: string, reviewed
   return new Promise((resolve, reject) => {
     const request = { execution_id, reviewed_actions };
     invoke("review_actions_command", { request }).then(response => {
-      console.log(`[rustReplaceExecutionActions]`, { request, response });
+      // console.log(`[rustReplaceExecutionActions]`, { request, response });
       resolve();
     }).catch(error => {
-      console.log(`[rustReplaceExecutionActions]`, { request, error });
+      // console.log(`[rustReplaceExecutionActions]`, { request, error });
       reject(error);
     });
   });
@@ -308,10 +308,10 @@ export async function rustRetryExecution(execution_id: string, message: string):
   return new Promise((resolve, reject) => {
     const request = { execution_id, message };
     invoke("retry_execution_command", { request }).then(response => {
-      console.log(`[rustRetryExecution]`, { request, response });
+      // console.log(`[rustRetryExecution]`, { request, response });
       resolve();
     }).catch(error => {
-      console.log(`[rustRetryExecution]`, { request, error });
+      // console.log(`[rustRetryExecution]`, { request, error });
       reject(error);
     });
   });
@@ -326,13 +326,29 @@ export async function rustAuthLogin(username: string, password: string): Promise
   return new Promise((resolve, reject) => {
     const request = { username, password };
     invoke("auth_login_command", { request }).then((response) => {
-      console.log(`[rustAuthLogin]`, { request, response });
+      // console.log(`[rustAuthLogin]`, { request, response });
       resolve({
         accessToken: (response as AuthLoginResponseFromRust).access_token,
         refreshToken: (response as AuthLoginResponseFromRust).refresh_token,
       });
     }).catch(error => {
-      console.log(`[rustAuthLogin]`, { request, error });
+      // console.log(`[rustAuthLogin]`, { request, error });
+      reject(error);
+    });
+  });
+}
+
+export async function rustRefreshToken(refresh_token: string): Promise<ReduxAuthPayload> {
+  return new Promise((resolve, reject) => {
+    const request = { refresh_token };
+    invoke("auth_refresh_token_command", { request }).then((response) => {
+      // console.log(`[rustRefreshToken]`, { request, response });
+      resolve({
+        accessToken: (response as AuthLoginResponseFromRust).access_token,
+        refreshToken: (response as AuthLoginResponseFromRust).refresh_token,
+      });
+    }).catch(error => {
+      // console.log(`[rustRefreshToken]`, { request, error });
       reject(error);
     });
   });

@@ -1,6 +1,6 @@
 import { Dispatch, PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { invoke } from "@tauri-apps/api";
-import { rustAuthLogin } from "../../services/rust";
+import { rustAuthLogin, rustRefreshToken } from "../../services/rust";
 import { RootState } from "../store";
 import * as jose from 'jose';
 
@@ -8,6 +8,7 @@ import * as jose from 'jose';
 
 const initialState: ReduxAuthState = {
   accessToken: '',
+  accessTokenExp: 0,
   refreshToken: '',
   loading: false,
   errorMessage: '',
@@ -16,6 +17,7 @@ const initialState: ReduxAuthState = {
 
 interface ReduxAuthState {
   accessToken: string;
+  accessTokenExp: number;
   refreshToken: string;
   loading: boolean;
   errorMessage: string;
@@ -35,7 +37,6 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setAuth: (state: ReduxAuthState, action: PayloadAction<ReduxAuthPayload>): ReduxAuthState => {
-      console.log('decoded :::: ', { action });
       const decoded = jose.decodeJwt(action.payload.accessToken);
       let user: ReduxCurrentUser | null = null;
       if (decoded) {
@@ -50,6 +51,7 @@ export const authSlice = createSlice({
         loading: false,
         errorMessage: '',
         accessToken: action.payload.accessToken,
+        accessTokenExp: (decoded.exp ?? 0) * 1000,
         refreshToken: action.payload.refreshToken,
         user,
       };
@@ -97,6 +99,28 @@ export const authLoginThunk = (username: string, password: string) => (dispatch:
       resolve();
     }).catch((error: string) => {
       console.log(`[authLoginThunk] error: `, { error });
+      dispatch(authSlice.actions.setErrorMessage(error));
+      reject(error);
+    });
+  });
+};
+
+export const authRefreshTokenThunk = () => (dispatch: Dispatch, getState: () => RootState): Promise<void> => {
+  return new Promise(async (resolve, reject) => {
+    const { refreshToken, accessToken, accessTokenExp } = getState().auth;
+    const five_seconds = 5 * 1000;
+    if (Date.now() <= accessTokenExp - five_seconds) {
+      console.log(`[authRefreshTokenThunk] accessToken still valid`);
+      resolve();
+      return;
+    }
+    dispatch(authSlice.actions.setLoading(true));
+    rustRefreshToken(refreshToken).then((response: ReduxAuthPayload) => {
+      console.log(`[authRefreshTokenThunk] token refreshed!`);
+      dispatch(authSlice.actions.setAuth(response));
+      resolve();
+    }).catch((error: string) => {
+      console.log(`[authRefreshTokenThunk] refresh token error: `, { error });
       dispatch(authSlice.actions.setErrorMessage(error));
       reject(error);
     });

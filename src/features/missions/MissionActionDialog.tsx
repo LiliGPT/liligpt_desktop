@@ -21,7 +21,6 @@ export function MissionActionDialog(props: Props) {
   }, [action]);
 
   const findOriginalFile = (path: string) => {
-    console.log(contextFiles, path);
     const file = contextFiles.find(file => file.path === path);
     if (file) {
       return file;

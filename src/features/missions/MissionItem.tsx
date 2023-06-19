@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fetchExecutionsThunk, removeExecutionActionThunk } from "../../redux/slices/missionsSlice";
+import { approveAndRunExecutionThunk, commitExecutionLocalChangesThunk, deleteExecutionThunk, fetchExecutionsThunk, removeExecutionActionThunk, retryExecutionThunk } from "../../redux/slices/missionsSlice";
 import { MissionActions } from "./MissionActions";
 import { Close, Edit, Settings } from "@mui/icons-material";
 import { CustomButton } from "../buttons/CustomButton";
@@ -18,8 +18,7 @@ export function MissionItem(execution: Props) {
 
   const onClickFail = async () => {
     setLoading(true);
-    await rustExecutionDelete(execution.execution_id);
-    await dispatch(fetchExecutionsThunk());
+    await dispatch(deleteExecutionThunk(execution.execution_id));
     setLoading(false);
     setEditionMode(false);
   };
@@ -32,20 +31,9 @@ export function MissionItem(execution: Props) {
     setEditionMode(false);
   };
 
-  let onClickDeleteFile: ((action: MissionAction) => Promise<void>) | undefined;
-  if (!loading && editionMode) {
-    onClickDeleteFile = async (action: MissionAction) => {
-      setLoading(true);
-      await dispatch(removeExecutionActionThunk(execution.execution_id, action));
-      setLoading(false);
-      setEditionMode(false);
-    };
-  };
-
   const onClickRetryMission = async () => {
     setLoading(true);
-    await rustRetryExecution(execution.execution_id, execution.mission_data.message);
-    await dispatch(fetchExecutionsThunk());
+    await dispatch(retryExecutionThunk(execution.execution_id, execution.mission_data.message));
     // TODO: should we run the new actions locally?
     setLoading(false);
     setEditionMode(false);
@@ -53,22 +41,14 @@ export function MissionItem(execution: Props) {
 
   const onClickApproveAndRun = async () => {
     setLoading(true);
-    await rustPromptApproveAndRun(
-      execution.mission_data.project_dir,
-      execution.execution_id,
-    );
-    await dispatch(fetchExecutionsThunk());
+    await dispatch(approveAndRunExecutionThunk(execution.mission_data.project_dir, execution.execution_id));
     setLoading(false);
     setEditionMode(true);
   };
 
   const onClickCommitLocalFiles = async () => {
     setLoading(true);
-    await rustPromptSubmitReview(
-      execution.mission_data.project_dir,
-      execution.execution_id,
-    );
-    await dispatch(fetchExecutionsThunk());
+    await dispatch(commitExecutionLocalChangesThunk(execution.mission_data.project_dir, execution.execution_id));
     setLoading(false);
     setEditionMode(true);
   };
@@ -142,7 +122,7 @@ export function MissionItem(execution: Props) {
       </div>
       <MissionActions
         execution={execution}
-        onClickDelete={onClickDeleteFile}
+        canDelete={!loading && editionMode}
       />
       <MissionContextFiles
         execution={execution}
